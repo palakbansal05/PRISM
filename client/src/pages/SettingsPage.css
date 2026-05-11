@@ -1,0 +1,146 @@
+.settings-page h1 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 24px 0;
+}
+
+.settings-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 20px;
+  max-width: 520px;
+}
+
+.settings-card h3 {
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+  margin: 0 0 20px 0;
+}
+
+.settings-profile {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.settings-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: var(--gradient-brand);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.settings-profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.settings-field-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.settings-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  min-width: 50px;
+}
+
+.settings-value {
+  font-size: 14px;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.settings-msg {
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.settings-msg.error {
+  background: var(--red-glow);
+  border: 1px solid rgba(255, 71, 87, 0.25);
+  color: var(--red);
+}
+
+.settings-msg.success {
+  background: var(--green-glow);
+  border: 1px solid rgba(0, 230, 138, 0.25);
+  color: var(--green);
+}
+
+.settings-form-field {
+  margin-bottom: 14px;
+}
+
+.settings-form-field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 5px;
+}
+
+.settings-form-field input {
+  width: 100%;
+  padding: 9px 12px;
+  background: var(--bg-void);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 13px;
+  font-family: var(--font-sans);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+}
+
+.settings-form-field input:focus {
+  border-color: var(--cyan-dim);
+  box-shadow: 0 0 0 3px var(--cyan-glow);
+}
+
+.settings-form-field input::placeholder {
+  color: var(--text-muted);
+}
+
+.settings-submit {
+  padding: 9px 24px;
+  background: var(--gradient-brand);
+  background-size: 200% 200%;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  margin-top: 4px;
+  animation: gradientShift 4s ease infinite;
+}
+
+.settings-submit:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(0, 212, 255, 0.3);
+}
+
+.settings-submit:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}

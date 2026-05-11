@@ -1,0 +1,149 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+/* ---- Global Reset & Design Tokens ---- */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  /* Backgrounds */
+  --bg-void: #04060C;
+  --bg-primary: #080C18;
+  --bg-card: #0C1122;
+  --bg-card-hover: #101630;
+  --bg-elevated: #141A30;
+  --bg-sidebar: #070B16;
+
+  /* Borders */
+  --border: #1A2240;
+  --border-light: #243060;
+  --border-glow: rgba(0, 212, 255, 0.15);
+
+  /* Text */
+  --text-primary: #E8ECF4;
+  --text-secondary: #8892B0;
+  --text-tertiary: #5A6380;
+  --text-muted: #3D4663;
+
+  /* Accent Colors */
+  --cyan: #00D4FF;
+  --cyan-dim: #0099BB;
+  --cyan-glow: rgba(0, 212, 255, 0.15);
+  --purple: #A855F7;
+  --purple-dim: #7C3AED;
+  --purple-glow: rgba(168, 85, 247, 0.15);
+  --blue: #3B82F6;
+  --blue-glow: rgba(59, 130, 246, 0.15);
+
+  /* Status */
+  --green: #00E68A;
+  --green-dim: #059669;
+  --green-glow: rgba(0, 230, 138, 0.12);
+  --red: #FF4757;
+  --red-dim: #DC2626;
+  --red-glow: rgba(255, 71, 87, 0.12);
+  --amber: #FFB647;
+  --amber-dim: #D97706;
+  --amber-glow: rgba(255, 182, 71, 0.12);
+
+  /* Typography */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+
+  /* Gradients */
+  --gradient-brand: linear-gradient(135deg, #00D4FF, #A855F7);
+  --gradient-brand-hover: linear-gradient(135deg, #00E5FF, #B96CF7);
+  --gradient-card: linear-gradient(180deg, rgba(0, 212, 255, 0.03) 0%, transparent 100%);
+  --gradient-sidebar: linear-gradient(180deg, #070B16 0%, #0A0F1E 100%);
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: var(--font-sans);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-light);
+}
+
+::selection {
+  background: rgba(0, 212, 255, 0.25);
+  color: #fff;
+}
+
+/* ---- Shared Animations ---- */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(16px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slideDown {
+  from { transform: translateY(-8px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.85); }
+}
+
+@keyframes glow {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}

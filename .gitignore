@@ -1,0 +1,31 @@
+# Common ignores
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Environment variables
+.env
+
+# IDE and editor directories
+.vscode/
+!.vscode/extensions.json
+.idea/
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+
+# Miscellaneous
+.cache/
+*.pem
+
+# Server specific
+server/node_modules/
+server/package-lock.json
+
+# Client specific
+client/node_modules/
+client/dist/
+client/package-lock.json
+
