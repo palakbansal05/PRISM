@@ -34,7 +34,7 @@
 
 .add-endpoint-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 20px rgba(0, 212, 255, 0.3);
+  box-shadow: 0 4px 20px rgba(0, 255, 65, 0.3);
 }
 
 .endpoints-table-card {
@@ -66,7 +66,7 @@
   max-width: 500px;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6), 0 0 80px rgba(0, 212, 255, 0.03);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6), 0 0 80px rgba(0, 255, 65, 0.03);
   animation: slideUp 0.2s ease;
 }
 
@@ -198,7 +198,7 @@
 
 .modal-submit:hover:not(:disabled) {
   transform: translateY(-1px);
-  box-shadow: 0 4px 20px rgba(0, 212, 255, 0.3);
+  box-shadow: 0 4px 20px rgba(0, 255, 65, 0.3);
 }
 
 .modal-submit:disabled {

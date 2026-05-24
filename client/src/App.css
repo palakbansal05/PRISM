@@ -11,38 +11,38 @@
 
 :root {
   /* Backgrounds */
-  --bg-void: #04060C;
-  --bg-primary: #080C18;
-  --bg-card: #0C1122;
-  --bg-card-hover: #101630;
-  --bg-elevated: #141A30;
-  --bg-sidebar: #070B16;
+  --bg-void: #001118;
+  --bg-primary: #001E2B;
+  --bg-card: #002B3D;
+  --bg-card-hover: #003B52;
+  --bg-elevated: #004B68;
+  --bg-sidebar: #001620;
 
   /* Borders */
-  --border: #1A2240;
-  --border-light: #243060;
-  --border-glow: rgba(0, 212, 255, 0.15);
+  --border: #003D54;
+  --border-light: #005A7A;
+  --border-glow: rgba(0, 237, 100, 0.15);
 
   /* Text */
-  --text-primary: #E8ECF4;
-  --text-secondary: #8892B0;
-  --text-tertiary: #5A6380;
-  --text-muted: #3D4663;
+  --text-primary: #E0F2F1;
+  --text-secondary: #B2DFDB;
+  --text-tertiary: #80CBC4;
+  --text-muted: #4DB6AC;
 
   /* Accent Colors */
-  --cyan: #00D4FF;
-  --cyan-dim: #0099BB;
-  --cyan-glow: rgba(0, 212, 255, 0.15);
-  --purple: #A855F7;
-  --purple-dim: #7C3AED;
-  --purple-glow: rgba(168, 85, 247, 0.15);
-  --blue: #3B82F6;
-  --blue-glow: rgba(59, 130, 246, 0.15);
+  --cyan: #00ED64;
+  --cyan-dim: #00C853;
+  --cyan-glow: rgba(0, 237, 100, 0.15);
+  --purple: #00B4D8;
+  --purple-dim: #0096C7;
+  --purple-glow: rgba(0, 180, 216, 0.15);
+  --blue: #48CAE4;
+  --blue-glow: rgba(72, 202, 228, 0.15);
 
   /* Status */
-  --green: #00E68A;
-  --green-dim: #059669;
-  --green-glow: rgba(0, 230, 138, 0.12);
+  --green: #00ED64;
+  --green-dim: #00C853;
+  --green-glow: rgba(0, 237, 100, 0.12);
   --red: #FF4757;
   --red-dim: #DC2626;
   --red-glow: rgba(255, 71, 87, 0.12);
@@ -55,10 +55,10 @@
   --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
 
   /* Gradients */
-  --gradient-brand: linear-gradient(135deg, #00D4FF, #A855F7);
-  --gradient-brand-hover: linear-gradient(135deg, #00E5FF, #B96CF7);
-  --gradient-card: linear-gradient(180deg, rgba(0, 212, 255, 0.03) 0%, transparent 100%);
-  --gradient-sidebar: linear-gradient(180deg, #070B16 0%, #0A0F1E 100%);
+  --gradient-brand: linear-gradient(135deg, #00ED64, #00B4D8);
+  --gradient-brand-hover: linear-gradient(135deg, #00FF7A, #48CAE4);
+  --gradient-card: linear-gradient(180deg, rgba(0, 237, 100, 0.05) 0%, transparent 100%);
+  --gradient-sidebar: linear-gradient(180deg, #00121A 0%, #001C29 100%);
 }
 
 html {
@@ -73,6 +73,10 @@ body {
   color: var(--text-primary);
   line-height: 1.5;
   min-height: 100vh;
+  background-image:
+    linear-gradient(rgba(0, 237, 100, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 237, 100, 0.05) 1px, transparent 1px);
+  background-size: 60px 60px;
 }
 
 #root {
@@ -108,7 +112,7 @@ button {
 }
 
 ::selection {
-  background: rgba(0, 212, 255, 0.25);
+  background: rgba(0, 255, 65, 0.25);
   color: #fff;
 }
 

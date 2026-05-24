@@ -19,8 +19,8 @@ export default function LandingPage() {
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="url(#navGrad)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <defs>
                 <linearGradient id="navGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#00D4FF" />
-                  <stop offset="100%" stopColor="#A855F7" />
+                  <stop offset="0%" stopColor="#FFFFFF" />
+                  <stop offset="100%" stopColor="#00B4D8" />
                 </linearGradient>
               </defs>
               <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
@@ -38,7 +38,7 @@ export default function LandingPage() {
       <section className="landing-hero">
         <div className="hero-badge">
           <span className="hero-badge-dot"></span>
-          Self-Hosted API Monitoring
+          Reliable API Monitoring
         </div>
 
         <h1 className="hero-title">
@@ -54,8 +54,8 @@ export default function LandingPage() {
 
         <p className="hero-description">
           Monitor your APIs in real-time. Track uptime, latency percentiles, 
-          and replay failed requests — all from your own infrastructure. 
-          No third-party dependencies. Full control.
+          and replay failed requests instantly. Get notified before your users 
+          even notice an outage.
         </p>
 
         <div className="hero-cta">
@@ -69,6 +69,31 @@ export default function LandingPage() {
           <Link to="/login" className="cta-secondary">
             Sign In
           </Link>
+        </div>
+      </section>
+
+      {/* Code Snippet Section */}
+      <section className="landing-snippet">
+        <div className="snippet-container">
+          <div className="snippet-header">
+            <span className="dot red"></span>
+            <span className="dot amber"></span>
+            <span className="dot green"></span>
+            <span className="snippet-title">health-check.js</span>
+          </div>
+          <pre className="snippet-code">
+            <code>
+<span className="code-keyword">const</span> endpoint = <span className="code-string">'https://api.yourdomain.com/v1/health'</span>;<br/>
+<span className="code-keyword">const</span> result = <span className="code-keyword">await</span> monitor.ping(endpoint);<br/>
+<br/>
+<span className="code-keyword">if</span> (!result.success) {'{'}<br/>
+{'  '}alert.trigger(<span className="code-string">'Endpoint Down!'</span>, result.latencyMs);<br/>
+{'  '}incident.record(result.error);<br/>
+{'}'} <span className="code-keyword">else</span> {'{'}<br/>
+{'  '}metrics.recordLatency(result.latencyMs);<br/>
+{'}'}<br/>
+            </code>
+          </pre>
         </div>
       </section>
 
@@ -114,9 +139,8 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="landing-footer">
-        <p>Built for engineers who want control over their monitoring stack.</p>
+        <p>Built for teams who need fast, reliable observability.</p>
       </footer>
     </div>
   );

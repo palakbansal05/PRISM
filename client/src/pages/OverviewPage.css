@@ -22,7 +22,7 @@
   font-weight: 600;
   color: var(--green);
   background: var(--green-glow);
-  border: 1px solid rgba(0, 230, 138, 0.15);
+  border: 1px solid rgba(0, 255, 127, 0.15);
   padding: 5px 14px;
   border-radius: 20px;
 }
@@ -33,7 +33,18 @@
   background: var(--green);
   border-radius: 50%;
   animation: pulse 2s ease-in-out infinite;
-  box-shadow: 0 0 8px rgba(0, 230, 138, 0.5);
+  box-shadow: 0 0 8px rgba(0, 255, 127, 0.5);
+}
+
+.overview-live-badge.disconnected {
+  color: var(--amber);
+  background: var(--amber-glow);
+  border-color: rgba(255, 182, 71, 0.15);
+}
+
+.overview-live-badge.disconnected .pulse-dot {
+  background: var(--amber);
+  box-shadow: 0 0 8px rgba(255, 182, 71, 0.5);
 }
 
 /* ---- Stat Cards Grid ---- */

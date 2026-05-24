@@ -2,7 +2,7 @@
  * Scheduler Manager
  * 
  * Runs in the main thread. Spawns the scheduler worker thread
- * and handles communication (alert dispatch via Resend).
+ * and handles communication (alert dispatch via Resend + Socket.IO events).
  */
 
 const { Worker } = require('worker_threads');
@@ -30,6 +30,16 @@ function start() {
   worker.on('message', async (msg) => {
     switch (msg.type) {
       case 'CHECK_FAILED':
+        // Emit real-time event to all connected clients
+        if (global.io) {
+          global.io.emit('incident:new', {
+            endpointId: msg.endpointId,
+            endpointName: msg.endpointName,
+            ping: msg.ping,
+          });
+        }
+
+        // Send email alert
         try {
           const endpoint = await Endpoint.findById(msg.endpointId);
           if (endpoint && endpoint.alertEmail) {
@@ -41,6 +51,16 @@ function start() {
         break;
 
       case 'CHECK_RECOVERED':
+        // Emit real-time recovery event
+        if (global.io) {
+          global.io.emit('incident:resolved', {
+            endpointId: msg.endpointId,
+            endpointName: msg.endpointName,
+            ping: msg.ping,
+          });
+        }
+
+        // Send recovery email
         try {
           const endpoint = await Endpoint.findById(msg.endpointId);
           if (endpoint && endpoint.alertEmail) {
@@ -48,6 +68,17 @@ function start() {
           }
         } catch (err) {
           console.error('Recovery alert dispatch error:', err.message);
+        }
+        break;
+
+      case 'CHECK_OK':
+        // Emit real-time successful check for live dashboard updates
+        if (global.io) {
+          global.io.emit('ping:update', {
+            endpointId: msg.endpointId,
+            endpointName: msg.endpointName,
+            ping: msg.ping,
+          });
         }
         break;
     }

@@ -44,7 +44,7 @@
 }
 
 .endpoint-table tbody tr:hover {
-  background: rgba(0, 212, 255, 0.02);
+  background: rgba(0, 255, 65, 0.02);
 }
 
 .endpoint-table tbody td {

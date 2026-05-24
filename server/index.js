@@ -3,6 +3,8 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const http = require('http');
+const { Server } = require('socket.io');
 
 const authRoutes = require('./routes/auth');
 const endpointRoutes = require('./routes/endpoints');
@@ -12,7 +14,27 @@ const scheduler = require('./scheduler');
 const mailer = require('./utils/mailer');
 
 const app = express();
+const server = http.createServer(app);
 const PORT = process.env.PORT || 5000;
+
+// --------------- Socket.IO ---------------
+const io = new Server(server, {
+  cors: {
+    origin: ['http://localhost:5173', 'http://127.0.0.1:5173'],
+    methods: ['GET', 'POST'],
+  },
+});
+
+// Make io globally accessible for the scheduler
+global.io = io;
+
+io.on('connection', (socket) => {
+  console.log(`🔌 Client connected: ${socket.id}`);
+
+  socket.on('disconnect', () => {
+    console.log(`🔌 Client disconnected: ${socket.id}`);
+  });
+});
 
 // --------------- Middleware ---------------
 app.use(cors());
@@ -48,8 +70,9 @@ async function startServer() {
     // Start the scheduler worker thread
     scheduler.start();
 
-    app.listen(PORT, () => {
-      console.log(`🚀 API Health Observatory server running on port ${PORT}`);
+    // Use server.listen instead of app.listen for Socket.IO
+    server.listen(PORT, () => {
+      console.log(`🚀 PRISM server running on port ${PORT}`);
     });
   } catch (err) {
     console.error('❌ Failed to start server:', err);

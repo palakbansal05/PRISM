@@ -80,7 +80,7 @@
 
 .settings-msg.success {
   background: var(--green-glow);
-  border: 1px solid rgba(0, 230, 138, 0.25);
+  border: 1px solid rgba(0, 255, 127, 0.25);
   color: var(--green);
 }
 
@@ -137,7 +137,7 @@
 
 .settings-submit:hover:not(:disabled) {
   transform: translateY(-1px);
-  box-shadow: 0 4px 20px rgba(0, 212, 255, 0.3);
+  box-shadow: 0 4px 20px rgba(0, 255, 65, 0.3);
 }
 
 .settings-submit:disabled {

@@ -14,10 +14,14 @@ api.interceptors.request.use((config) => {
 });
 
 // Response interceptor: handle 401 by clearing auth and redirecting
+// SKIP redirect for auth endpoints so login/register can show error messages
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response && error.response.status === 401) {
+    const url = error.config?.url || '';
+    const isAuthRoute = url.includes('/auth/login') || url.includes('/auth/register');
+
+    if (error.response && error.response.status === 401 && !isAuthRoute) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       window.location.href = '/login';

@@ -16,12 +16,12 @@ function timeAgo(date) {
 
 function MethodBadge({ method }) {
   const colors = {
-    GET: '#00D4FF',
-    POST: '#00E68A',
+    GET: '#00FF41',
+    POST: '#00FF7F',
     PUT: '#FFB647',
     DELETE: '#FF4757',
-    PATCH: '#A855F7',
-    HEAD: '#5A6380',
+    PATCH: '#39FF78',
+    HEAD: '#5A8068',
   };
   const color = colors[method] || '#6B7280';
   return (
@@ -48,7 +48,7 @@ function UptimeMinibar({ endpointId }) {
       .catch(() => setBuckets([]));
   }, [endpointId]);
 
-  const colorMap = { up: '#00E68A', down: '#FF4757', slow: '#FFB647', empty: '#1A2240' };
+  const colorMap = { up: '#00FF7F', down: '#FF4757', slow: '#FFB647', empty: '#1A3A20' };
 
   return (
     <div className="uptime-minibar">
@@ -77,7 +77,7 @@ export default function EndpointTable({ endpoints, showDelete = false, onDelete 
     <div className="endpoint-table-wrap">
       {(!endpoints || endpoints.length === 0) ? (
         <div className="endpoint-table-empty">
-          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#4B5563" strokeWidth="1.5">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#5A8068" strokeWidth="1.5">
             <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/>
             <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
           </svg>

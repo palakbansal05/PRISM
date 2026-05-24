@@ -1,18 +1,3 @@
-/**
- * Scheduler Worker Thread
- * 
- * Runs in a separate thread so health check HTTP requests never block
- * the Express event loop. Communicates with main thread via messages.
- * 
- * Why Worker Threads?
- * ------------------
- * The scheduler fires many concurrent HTTP requests (one per monitored endpoint).
- * If 50+ endpoints are being checked simultaneously, the DNS resolution, TLS 
- * handshakes, and response parsing could starve the main thread's event loop,
- * causing the Express server to become unresponsive. By isolating the scheduler
- * in a worker thread, the API server remains fast and responsive regardless
- * of monitoring load.
- */
 
 const { parentPort, workerData } = require('worker_threads');
 const mongoose = require('mongoose');
@@ -138,6 +123,7 @@ async function executeCheck(endpoint) {
       parentPort.postMessage({
         type: 'CHECK_FAILED',
         endpointId: endpoint._id.toString(),
+        endpointName: endpoint.name,
         ping: ping.toObject(),
       });
     } else {
@@ -151,6 +137,14 @@ async function executeCheck(endpoint) {
         parentPort.postMessage({
           type: 'CHECK_RECOVERED',
           endpointId: endpoint._id.toString(),
+          endpointName: endpoint.name,
+          ping: ping.toObject(),
+        });
+      } else {
+        parentPort.postMessage({
+          type: 'CHECK_OK',
+          endpointId: endpoint._id.toString(),
+          endpointName: endpoint.name,
           ping: ping.toObject(),
         });
       }
@@ -180,6 +174,7 @@ async function executeCheck(endpoint) {
     parentPort.postMessage({
       type: 'CHECK_FAILED',
       endpointId: endpoint._id.toString(),
+      endpointName: endpoint.name,
       ping: ping.toObject(),
     });
   }

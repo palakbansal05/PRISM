@@ -79,7 +79,7 @@ export default function LatencyChart({ endpoints }) {
 
       {data.length === 0 ? (
         <div className="chart-empty">
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#4B5563" strokeWidth="1.5">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#5A8068" strokeWidth="1.5">
             <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
           </svg>
           <p>No latency data yet. Waiting for health checks...</p>
@@ -87,16 +87,16 @@ export default function LatencyChart({ endpoints }) {
       ) : (
         <ResponsiveContainer width="100%" height={240}>
           <LineChart data={data} margin={{ top: 5, right: 5, bottom: 5, left: -10 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#1A2240" />
-            <XAxis dataKey="time" stroke="#3D4663" fontSize={11} tickLine={false} />
-            <YAxis stroke="#3D4663" fontSize={11} tickLine={false} unit="ms" />
+            <CartesianGrid strokeDasharray="3 3" stroke="#1A3A20" />
+            <XAxis dataKey="time" stroke="#3D6348" fontSize={11} tickLine={false} />
+            <YAxis stroke="#3D6348" fontSize={11} tickLine={false} unit="ms" />
             <Tooltip content={<CustomTooltip />} />
             <Legend
               wrapperStyle={{ fontSize: '12px', paddingTop: '8px' }}
               iconType="circle"
               iconSize={8}
             />
-            <Line type="monotone" dataKey="p50" stroke="#00D4FF" strokeWidth={2} dot={false} name="p50" />
+            <Line type="monotone" dataKey="p50" stroke="#00FF41" strokeWidth={2} dot={false} name="p50" />
             <Line type="monotone" dataKey="p95" stroke="#FFB647" strokeWidth={2} dot={false} name="p95" />
             <Line type="monotone" dataKey="p99" stroke="#FF4757" strokeWidth={2} dot={false} name="p99" />
           </LineChart>
