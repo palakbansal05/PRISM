@@ -6,6 +6,7 @@ const cors = require('cors');
 const http = require('http');
 const { Server } = require('socket.io');
 
+const { authLimiter, apiLimiter } = require('./middleware/rateLimit');
 const authRoutes = require('./routes/auth');
 const endpointRoutes = require('./routes/endpoints');
 const statsRoutes = require('./routes/stats');
@@ -41,10 +42,10 @@ app.use(cors());
 app.use(express.json());
 
 // --------------- Routes ---------------
-app.use('/api/auth', authRoutes);
-app.use('/api/endpoints', endpointRoutes);
-app.use('/api/stats', statsRoutes);
-app.use('/api/incidents', incidentRoutes);
+app.use('/api/auth', authLimiter, authRoutes);
+app.use('/api/endpoints', apiLimiter, endpointRoutes);
+app.use('/api/stats', apiLimiter, statsRoutes);
+app.use('/api/incidents', apiLimiter, incidentRoutes);
 
 // Health check route
 app.get('/api/health', (req, res) => {

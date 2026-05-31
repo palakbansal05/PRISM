@@ -56,18 +56,18 @@ export default function OverviewPage() {
       setWsConnected(false);
     });
 
-    // Real-time: new incident
+    // Real-time: new incident opened (HEALTHY → DOWN)
     socket.on('incident:new', (data) => {
       console.log('🔴 New incident:', data.endpointName);
       setIncidents((prev) => [
         {
-          _id: data.ping._id,
+          _id: data.incident._id,
           endpointId: { _id: data.endpointId, name: data.endpointName },
-          statusCode: data.ping.statusCode,
-          latencyMs: data.ping.latencyMs,
-          error: data.ping.error,
-          success: false,
-          timestamp: data.ping.timestamp,
+          status: 'ACTIVE',
+          reason: data.incident.reason,
+          startedAt: data.incident.startedAt,
+          resolvedAt: null,
+          failureCount: data.incident.failureCount,
         },
         ...prev,
       ]);
@@ -75,7 +75,30 @@ export default function OverviewPage() {
       fetchData();
     });
 
-    // Real-time: incident resolved
+    // Real-time: incident updated (still DOWN, failure count incremented)
+    socket.on('incident:update', (data) => {
+      setIncidents((prev) =>
+        prev.map((inc) =>
+          inc._id === data.incidentId
+            ? { ...inc, failureCount: data.failureCount }
+            : inc
+        )
+      );
+      // Update endpoint status in table
+      setEndpoints((prev) =>
+        prev.map((ep) =>
+          ep._id === data.endpointId
+            ? {
+                ...ep,
+                lastChecked: data.ping.timestamp,
+                lastPing: { ...data.ping, success: false },
+              }
+            : ep
+        )
+      );
+    });
+
+    // Real-time: incident resolved (DOWN → UP)
     socket.on('incident:resolved', (data) => {
       console.log('🟢 Incident resolved:', data.endpointName);
       // Refresh all data
@@ -111,6 +134,7 @@ export default function OverviewPage() {
       socket.off('connect');
       socket.off('disconnect');
       socket.off('incident:new');
+      socket.off('incident:update');
       socket.off('incident:resolved');
       socket.off('ping:update');
       socket.disconnect();

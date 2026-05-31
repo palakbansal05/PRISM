@@ -2,7 +2,13 @@
  * Scheduler Manager
  * 
  * Runs in the main thread. Spawns the scheduler worker thread
- * and handles communication (alert dispatch via Resend + Socket.IO events).
+ * and handles communication (alert dispatch via Nodemailer + Socket.IO events).
+ * 
+ * Message types from worker:
+ *   INCIDENT_OPENED   → New incident created (HEALTHY→DOWN). Send email + emit socket.
+ *   INCIDENT_UPDATED  → Existing incident updated (still DOWN). Emit socket only, NO email.
+ *   INCIDENT_RESOLVED → Incident resolved (DOWN→HEALTHY). Send recovery email + emit socket.
+ *   CHECK_OK          → Normal successful check. Emit socket for live dashboard.
  */
 
 const { Worker } = require('worker_threads');
@@ -29,50 +35,64 @@ function start() {
 
   worker.on('message', async (msg) => {
     switch (msg.type) {
-      case 'CHECK_FAILED':
-        // Emit real-time event to all connected clients
+      // ──── NEW INCIDENT (first failure → DOWN) ────
+      case 'INCIDENT_OPENED':
         if (global.io) {
           global.io.emit('incident:new', {
             endpointId: msg.endpointId,
             endpointName: msg.endpointName,
-            ping: msg.ping,
+            incident: msg.incident,
           });
         }
 
-        // Send email alert
+        // Send ONE failure alert email
         try {
           const endpoint = await Endpoint.findById(msg.endpointId);
           if (endpoint && endpoint.alertEmail) {
-            await mailer.sendDownAlert(endpoint, msg.ping);
+            await mailer.sendDownAlert(endpoint, msg.incident);
           }
         } catch (err) {
           console.error('Alert dispatch error:', err.message);
         }
         break;
 
-      case 'CHECK_RECOVERED':
-        // Emit real-time recovery event
+      // ──── STILL FAILING (update existing incident) ────
+      case 'INCIDENT_UPDATED':
+        // Only emit socket for live dashboard — NO email
+        if (global.io) {
+          global.io.emit('incident:update', {
+            endpointId: msg.endpointId,
+            endpointName: msg.endpointName,
+            incidentId: msg.incidentId,
+            failureCount: msg.failureCount,
+            ping: msg.ping,
+          });
+        }
+        break;
+
+      // ──── RECOVERED (DOWN → UP) ────
+      case 'INCIDENT_RESOLVED':
         if (global.io) {
           global.io.emit('incident:resolved', {
             endpointId: msg.endpointId,
             endpointName: msg.endpointName,
-            ping: msg.ping,
+            incident: msg.incident,
           });
         }
 
-        // Send recovery email
+        // Send ONE recovery email
         try {
           const endpoint = await Endpoint.findById(msg.endpointId);
           if (endpoint && endpoint.alertEmail) {
-            await mailer.sendRecoveryAlert(endpoint, msg.ping);
+            await mailer.sendRecoveryAlert(endpoint, msg.incident);
           }
         } catch (err) {
           console.error('Recovery alert dispatch error:', err.message);
         }
         break;
 
+      // ──── NORMAL OK PING ────
       case 'CHECK_OK':
-        // Emit real-time successful check for live dashboard updates
         if (global.io) {
           global.io.emit('ping:update', {
             endpointId: msg.endpointId,

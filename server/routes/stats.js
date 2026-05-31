@@ -1,6 +1,7 @@
 const express = require('express');
 const Ping = require('../models/Ping');
 const Endpoint = require('../models/Endpoint');
+const Incident = require('../models/Incident');
 const auth = require('../middleware/auth');
 
 const router = express.Router();
@@ -32,14 +33,11 @@ router.get('/', async (req, res) => {
     const successPings = recentPings.filter((p) => p.success).length;
     const overallUptimePercent = totalPings > 0 ? ((successPings / totalPings) * 100).toFixed(2) : 100;
 
-    // Active incidents: count endpoints whose last ping was a failure
-    let activeIncidentsCount = 0;
-    for (const ep of endpoints) {
-      const lastPing = await Ping.findOne({ endpointId: ep._id }).sort({ timestamp: -1 });
-      if (lastPing && !lastPing.success) {
-        activeIncidentsCount++;
-      }
-    }
+    // Active incidents: count ACTIVE incidents from the Incident model
+    const activeIncidentsCount = await Incident.countDocuments({
+      userId: req.userId,
+      status: 'ACTIVE',
+    });
 
     // P50 (median) latency from last 24h
     const latencies = recentPings

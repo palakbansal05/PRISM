@@ -14,6 +14,20 @@ function timeAgo(date) {
   return `${days}d ago`;
 }
 
+function formatDuration(startedAt, resolvedAt) {
+  const start = new Date(startedAt).getTime();
+  const end = resolvedAt ? new Date(resolvedAt).getTime() : Date.now();
+  const ms = end - start;
+  const seconds = Math.floor(ms / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+  if (days > 0) return `${days}d ${hours % 24}h ${minutes % 60}m`;
+  if (hours > 0) return `${hours}h ${minutes % 60}m`;
+  if (minutes > 0) return `${minutes}m ${seconds % 60}s`;
+  return `${seconds}s`;
+}
+
 export default function IncidentsPage() {
   const [incidents, setIncidents] = useState([]);
   const [replayData, setReplayData] = useState(null);
@@ -78,28 +92,43 @@ export default function IncidentsPage() {
           </div>
         ) : (
           <div className="incidents-list">
+            <div className="incident-row-header">
+              <div className="incident-row-dot"></div>
+              <div className="incident-row-info">Endpoint</div>
+              <div className="incident-row-status">Status</div>
+              <div className="incident-row-duration">Duration</div>
+              <div className="incident-row-failures">Failures</div>
+              <div className="incident-row-time">Started</div>
+              <div className="incident-replay-btn" style={{ visibility: 'hidden' }}>Replay</div>
+            </div>
             {incidents.map((inc) => {
               const ep = inc.endpointId;
               const epId = ep?._id;
               const replay = inlineReplay[epId];
+              const isActive = inc.status === 'ACTIVE';
 
               return (
                 <div className="incident-row" key={inc._id}>
                   <div className="incident-row-main">
                     <div className="incident-row-dot">
-                      <span className="incident-dot red"></span>
+                      <span className={`incident-dot ${isActive ? 'red' : 'green'}`}></span>
                     </div>
                     <div className="incident-row-info">
                       <span className="incident-row-name">{ep?.name || 'Unknown'}</span>
                       <span className="incident-row-url">{ep?.url || ''}</span>
                     </div>
                     <div className="incident-row-status">
-                      <span className="incident-status-code">{inc.statusCode || 'ERR'}</span>
+                      <span className={`incident-status-badge ${isActive ? 'active' : 'resolved'}`}>
+                        {isActive ? 'ACTIVE' : 'RESOLVED'}
+                      </span>
                     </div>
-                    <div className="incident-row-latency">
-                      {inc.latencyMs ? `${Math.round(inc.latencyMs)}ms` : '—'}
+                    <div className="incident-row-duration">
+                      {formatDuration(inc.startedAt, inc.resolvedAt)}
                     </div>
-                    <div className="incident-row-time">{timeAgo(inc.timestamp)}</div>
+                    <div className="incident-row-failures">
+                      {inc.failureCount} failure{inc.failureCount !== 1 ? 's' : ''}
+                    </div>
+                    <div className="incident-row-time">{timeAgo(inc.startedAt)}</div>
                     <button
                       className="incident-replay-btn"
                       onClick={() => handleReplay(epId, true)}

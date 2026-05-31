@@ -46,6 +46,29 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ error: 'Name and URL are required.' });
     }
 
+    if (name.trim().length < 1 || name.trim().length > 100) {
+      return res.status(400).json({ error: 'Name must be between 1 and 100 characters.' });
+    }
+
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      return res.status(400).json({ error: 'URL must start with http:// or https://' });
+    }
+
+    if (expectedStatus && (expectedStatus < 100 || expectedStatus > 599)) {
+      return res.status(400).json({ error: 'Expected status must be a valid HTTP code (100-599).' });
+    }
+
+    if (intervalSeconds && (intervalSeconds < 10 || intervalSeconds > 3600)) {
+      return res.status(400).json({ error: 'Interval must be between 10 and 3600 seconds.' });
+    }
+
+    if (alertEmail) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(alertEmail)) {
+        return res.status(400).json({ error: 'Invalid alert email format.' });
+      }
+    }
+
     // Parse headers if it's a string
     let parsedHeaders = headers || {};
     if (typeof headers === 'string') {

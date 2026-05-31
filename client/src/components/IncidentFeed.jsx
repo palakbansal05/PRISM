@@ -11,6 +11,18 @@ function timeAgo(date) {
   return `${days}d ago`;
 }
 
+function formatDuration(startedAt, resolvedAt) {
+  const start = new Date(startedAt).getTime();
+  const end = resolvedAt ? new Date(resolvedAt).getTime() : Date.now();
+  const ms = end - start;
+  const seconds = Math.floor(ms / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  if (hours > 0) return `${hours}h ${minutes % 60}m`;
+  if (minutes > 0) return `${minutes}m ${seconds % 60}s`;
+  return `${seconds}s`;
+}
+
 export default function IncidentFeed({ incidents, onReplay }) {
   return (
     <div className="incident-feed">
@@ -27,33 +39,36 @@ export default function IncidentFeed({ incidents, onReplay }) {
         ) : (
           incidents.map((inc) => {
             const ep = inc.endpointId;
+            const isActive = inc.status === 'ACTIVE';
             return (
               <div className="incident-item" key={inc._id}>
                 <div className="incident-dot-col">
-                  <span className={`incident-dot ${inc.success ? 'green' : 'red'}`}></span>
+                  <span className={`incident-dot ${isActive ? 'red' : 'green'}`}></span>
                 </div>
                 <div className="incident-info">
                   <span className="incident-title">{ep?.name || 'Unknown Endpoint'}</span>
                   <span className="incident-meta">
-                    {ep?.method || 'GET'} &middot; {timeAgo(inc.timestamp)} &middot;{' '}
-                    <span className={inc.statusCode ? '' : 'incident-err'}>
-                      {inc.statusCode || 'Error'}
-                    </span>
+                    {isActive ? '🔴 ACTIVE' : '🟢 RESOLVED'} &middot;{' '}
+                    {timeAgo(inc.startedAt)} &middot;{' '}
+                    {formatDuration(inc.startedAt, inc.resolvedAt)} &middot;{' '}
+                    {inc.failureCount} failure{inc.failureCount !== 1 ? 's' : ''}
                   </span>
-                  {inc.error && (
-                    <span className="incident-error-msg">{inc.error}</span>
+                  {inc.reason && (
+                    <span className="incident-error-msg">{inc.reason}</span>
                   )}
                 </div>
-                <button
-                  className="incident-replay-btn"
-                  onClick={() => onReplay(ep?._id)}
-                  title="Replay this request"
-                >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <polygon points="5 3 19 12 5 21 5 3" />
-                  </svg>
-                  Replay
-                </button>
+                {ep?._id && (
+                  <button
+                    className="incident-replay-btn"
+                    onClick={() => onReplay(ep._id)}
+                    title="Replay this request"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <polygon points="5 3 19 12 5 21 5 3" />
+                    </svg>
+                    Replay
+                  </button>
+                )}
               </div>
             );
           })

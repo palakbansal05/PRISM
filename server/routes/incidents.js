@@ -1,7 +1,8 @@
 const express = require('express');
 const axios = require('axios');
-const Ping = require('../models/Ping');
+const Incident = require('../models/Incident');
 const Endpoint = require('../models/Endpoint');
+const Ping = require('../models/Ping');
 const auth = require('../middleware/auth');
 
 const router = express.Router();
@@ -9,16 +10,13 @@ router.use(auth);
 
 /**
  * GET /api/incidents
- * Last 20 failed pings across all user endpoints, sorted by timestamp desc
- * Populated with endpoint name and URL
+ * Returns the 20 most recent incidents (ACTIVE first, then RESOLVED)
+ * for the logged-in user, populated with endpoint info.
  */
 router.get('/', async (req, res) => {
   try {
-    const incidents = await Ping.find({
-      userId: req.userId,
-      success: false,
-    })
-      .sort({ timestamp: -1 })
+    const incidents = await Incident.find({ userId: req.userId })
+      .sort({ startedAt: -1 })
       .limit(20)
       .populate('endpointId', 'name url method');
 
@@ -30,7 +28,7 @@ router.get('/', async (req, res) => {
 });
 
 /**
- * POST /api/endpoints/:id/replay
+ * POST /api/incidents/replay/:id
  * Re-fire the last failed request for the endpoint live
  * Returns the new result and a diff against the original failure
  */
@@ -62,7 +60,7 @@ router.post('/replay/:id', async (req, res) => {
         headers: endpoint.headers || {},
         data: endpoint.body || undefined,
         timeout: 15000,
-        validateStatus: () => true, // Accept any status code
+        validateStatus: () => true,
       });
 
       replayResult = {

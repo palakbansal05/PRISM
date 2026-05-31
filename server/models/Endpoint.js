@@ -52,6 +52,25 @@ const endpointSchema = new mongoose.Schema({
     type: Date,
     default: null,
   },
+  // ---- State Machine Fields ----
+  status: {
+    type: String,
+    enum: ['UP', 'DOWN'],
+    default: 'UP',
+  },
+  consecutiveFailures: {
+    type: Number,
+    default: 0,
+  },
+  consecutiveSuccesses: {
+    type: Number,
+    default: 0,
+  },
+  currentIncidentId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Incident',
+    default: null,
+  },
   createdAt: {
     type: Date,
     default: Date.now,

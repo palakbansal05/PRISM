@@ -1,10 +1,28 @@
+/**
+ * Scheduler Worker Thread — Incident State Machine
+ * 
+ * Runs in a separate thread so health check HTTP requests never block
+ * the Express event loop.
+ * 
+ * STATE MACHINE LOGIC:
+ * ────────────────────
+ * On failure:
+ *   1. Check if OPEN incident exists for this endpoint
+ *   2. If NO open incident  → Create incident, mark DOWN, notify main thread (sends email)
+ *   3. If OPEN incident exists → Update failureCount & lastCheckedAt only (NO new incident, NO email)
+ * 
+ * On success:
+ *   1. Check if OPEN incident exists for this endpoint
+ *   2. If OPEN incident exists → Resolve it, mark UP, notify main thread (sends recovery email)
+ *   3. If no open incident → Normal OK ping update
+ */
 
 const { parentPort, workerData } = require('worker_threads');
 const mongoose = require('mongoose');
 const axios = require('axios');
 
-// We need to re-register models in the worker thread's own mongoose connection
-let Endpoint, Ping;
+// Models will be registered after DB connection
+let Endpoint, Ping, Incident;
 
 // Track endpoints and their last check times
 const endpointMap = new Map();
@@ -26,6 +44,11 @@ async function connectDB() {
     alertEmail: { type: String, default: null },
     isActive: { type: Boolean, default: true },
     lastChecked: { type: Date, default: null },
+    // State machine fields
+    status: { type: String, enum: ['UP', 'DOWN'], default: 'UP' },
+    consecutiveFailures: { type: Number, default: 0 },
+    consecutiveSuccesses: { type: Number, default: 0 },
+    currentIncidentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Incident', default: null },
     createdAt: { type: Date, default: Date.now },
   });
 
@@ -44,8 +67,24 @@ async function connectDB() {
   pingSchema.index({ endpointId: 1, timestamp: -1 });
   pingSchema.index({ userId: 1, success: 1, timestamp: -1 });
 
+  const incidentSchema = new mongoose.Schema({
+    endpointId: { type: mongoose.Schema.Types.ObjectId, ref: 'Endpoint', required: true },
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    status: { type: String, enum: ['ACTIVE', 'RESOLVED'], default: 'ACTIVE' },
+    reason: { type: String, default: 'Unknown' },
+    statusCodeReceived: { type: Number, default: null },
+    startedAt: { type: Date, required: true, default: Date.now },
+    resolvedAt: { type: Date, default: null },
+    failureCount: { type: Number, default: 1 },
+    lastCheckedAt: { type: Date, default: Date.now },
+  });
+
+  incidentSchema.index({ endpointId: 1, status: 1 });
+  incidentSchema.index({ userId: 1, status: 1 });
+
   Endpoint = mongoose.model('Endpoint', endpointSchema);
   Ping = mongoose.model('Ping', pingSchema);
+  Incident = mongoose.model('Incident', incidentSchema);
 }
 
 /**
@@ -60,6 +99,7 @@ async function loadEndpoints() {
       ...obj,
       _id: ep._id.toString(),
       userId: ep.userId.toString(),
+      currentIncidentId: ep.currentIncidentId ? ep.currentIncidentId.toString() : null,
       lastChecked: ep.lastChecked ? ep.lastChecked.getTime() : 0,
     });
   }
@@ -67,10 +107,29 @@ async function loadEndpoints() {
 }
 
 /**
+ * Build a human-readable failure reason
+ */
+function buildReason(statusCode, expectedStatus, error) {
+  if (error) {
+    if (error.includes('timeout')) return 'Connection timeout';
+    if (error.includes('ECONNREFUSED')) return 'Connection refused';
+    if (error.includes('ENOTFOUND')) return 'DNS resolution failed';
+    return error.substring(0, 100);
+  }
+  if (statusCode !== null) {
+    return `HTTP ${statusCode} (expected ${expectedStatus})`;
+  }
+  return 'Unknown error';
+}
+
+/**
  * Execute a health check for a single endpoint
+ * Implements the incident state machine transitions
  */
 async function executeCheck(endpoint) {
   const startTime = Date.now();
+  const endpointOid = new mongoose.Types.ObjectId(endpoint._id);
+  const userOid = new mongoose.Types.ObjectId(endpoint.userId);
   let ping;
 
   try {
@@ -99,8 +158,8 @@ async function executeCheck(endpoint) {
     }
 
     ping = new Ping({
-      endpointId: new mongoose.Types.ObjectId(endpoint._id),
-      userId: new mongoose.Types.ObjectId(endpoint.userId),
+      endpointId: endpointOid,
+      userId: userOid,
       statusCode: response.status,
       latencyMs,
       responseBody,
@@ -112,49 +171,17 @@ async function executeCheck(endpoint) {
 
     await ping.save();
 
-    // Update lastChecked on the endpoint
-    await Endpoint.updateOne(
-      { _id: new mongoose.Types.ObjectId(endpoint._id) },
-      { $set: { lastChecked: new Date() } }
-    );
-
-    // Notify main thread about the result for alerting
     if (!success) {
-      parentPort.postMessage({
-        type: 'CHECK_FAILED',
-        endpointId: endpoint._id.toString(),
-        endpointName: endpoint.name,
-        ping: ping.toObject(),
-      });
+      await handleFailure(endpoint, ping, response.status);
     } else {
-      // Check if previous ping was a failure (recovery)
-      const previousPing = await Ping.findOne({
-        endpointId: new mongoose.Types.ObjectId(endpoint._id),
-        timestamp: { $lt: ping.timestamp },
-      }).sort({ timestamp: -1 });
-
-      if (previousPing && !previousPing.success) {
-        parentPort.postMessage({
-          type: 'CHECK_RECOVERED',
-          endpointId: endpoint._id.toString(),
-          endpointName: endpoint.name,
-          ping: ping.toObject(),
-        });
-      } else {
-        parentPort.postMessage({
-          type: 'CHECK_OK',
-          endpointId: endpoint._id.toString(),
-          endpointName: endpoint.name,
-          ping: ping.toObject(),
-        });
-      }
+      await handleSuccess(endpoint, ping);
     }
   } catch (err) {
     const latencyMs = Date.now() - startTime;
 
     ping = new Ping({
-      endpointId: new mongoose.Types.ObjectId(endpoint._id),
-      userId: new mongoose.Types.ObjectId(endpoint.userId),
+      endpointId: endpointOid,
+      userId: userOid,
       statusCode: null,
       latencyMs,
       responseBody: null,
@@ -165,15 +192,197 @@ async function executeCheck(endpoint) {
     });
 
     await ping.save();
+    await handleFailure(endpoint, ping, null, err.message);
+  }
 
+  // Update lastChecked on the endpoint
+  await Endpoint.updateOne(
+    { _id: new mongoose.Types.ObjectId(endpoint._id) },
+    { $set: { lastChecked: new Date() } }
+  );
+}
+
+/**
+ * FAILURE HANDLER — State machine transition
+ * 
+ * Case 1: No open incident → Create one, send email
+ * Case 2: Open incident exists → Update it, NO new email
+ */
+async function handleFailure(endpoint, ping, statusCode, errorMsg) {
+  const endpointOid = new mongoose.Types.ObjectId(endpoint._id);
+  const userOid = new mongoose.Types.ObjectId(endpoint.userId);
+  const now = new Date();
+  const reason = buildReason(statusCode, endpoint.expectedStatus, errorMsg || null);
+
+  // Check if there is already an OPEN incident for this endpoint
+  const openIncident = await Incident.findOne({
+    endpointId: endpointOid,
+    status: 'ACTIVE',
+  });
+
+  if (!openIncident) {
+    // ──── HEALTHY → FAILED transition ────
+    // Create ONE new incident
+    const incident = new Incident({
+      endpointId: endpointOid,
+      userId: userOid,
+      status: 'ACTIVE',
+      reason,
+      statusCodeReceived: statusCode,
+      startedAt: now,
+      lastCheckedAt: now,
+      failureCount: 1,
+    });
+    await incident.save();
+
+    // Update endpoint status to DOWN
     await Endpoint.updateOne(
-      { _id: new mongoose.Types.ObjectId(endpoint._id) },
-      { $set: { lastChecked: new Date() } }
+      { _id: endpointOid },
+      {
+        $set: {
+          status: 'DOWN',
+          currentIncidentId: incident._id,
+          consecutiveFailures: 1,
+          consecutiveSuccesses: 0,
+        },
+      }
     );
 
+    // Update in-memory map
+    endpoint.status = 'DOWN';
+    endpoint.currentIncidentId = incident._id.toString();
+    endpoint.consecutiveFailures = 1;
+    endpoint.consecutiveSuccesses = 0;
+    endpointMap.set(endpoint._id, endpoint);
+
+    // Notify main thread → triggers email + Socket.IO
     parentPort.postMessage({
-      type: 'CHECK_FAILED',
-      endpointId: endpoint._id.toString(),
+      type: 'INCIDENT_OPENED',
+      endpointId: endpoint._id,
+      endpointName: endpoint.name,
+      incident: incident.toObject(),
+      ping: ping.toObject(),
+    });
+
+    console.log(`🔴 [Incident OPENED] ${endpoint.name} — ${reason}`);
+  } else {
+    // ──── STILL FAILING (already DOWN) ────
+    // Just update the existing incident — NO new incident, NO new email
+    await Incident.updateOne(
+      { _id: openIncident._id },
+      {
+        $set: { lastCheckedAt: now },
+        $inc: { failureCount: 1 },
+      }
+    );
+
+    // Update consecutive counters on endpoint
+    await Endpoint.updateOne(
+      { _id: endpointOid },
+      {
+        $inc: { consecutiveFailures: 1 },
+        $set: { consecutiveSuccesses: 0 },
+      }
+    );
+
+    endpoint.consecutiveFailures = (endpoint.consecutiveFailures || 0) + 1;
+    endpoint.consecutiveSuccesses = 0;
+    endpointMap.set(endpoint._id, endpoint);
+
+    // Notify main thread for live dashboard update only (no email)
+    parentPort.postMessage({
+      type: 'INCIDENT_UPDATED',
+      endpointId: endpoint._id,
+      endpointName: endpoint.name,
+      incidentId: openIncident._id.toString(),
+      failureCount: openIncident.failureCount + 1,
+      ping: ping.toObject(),
+    });
+  }
+}
+
+/**
+ * SUCCESS HANDLER — State machine transition
+ * 
+ * Case 1: Open incident exists → Resolve it, send recovery email
+ * Case 2: No open incident → Normal OK ping
+ */
+async function handleSuccess(endpoint, ping) {
+  const endpointOid = new mongoose.Types.ObjectId(endpoint._id);
+  const now = new Date();
+
+  // Check if there is an OPEN incident for this endpoint
+  const openIncident = await Incident.findOne({
+    endpointId: endpointOid,
+    status: 'ACTIVE',
+  });
+
+  if (openIncident) {
+    // ──── FAILED → HEALTHY transition ────
+    // Resolve the incident
+    await Incident.updateOne(
+      { _id: openIncident._id },
+      {
+        $set: {
+          status: 'RESOLVED',
+          resolvedAt: now,
+          lastCheckedAt: now,
+        },
+      }
+    );
+
+    // Update endpoint status back to UP
+    await Endpoint.updateOne(
+      { _id: endpointOid },
+      {
+        $set: {
+          status: 'UP',
+          currentIncidentId: null,
+          consecutiveFailures: 0,
+          consecutiveSuccesses: 1,
+        },
+      }
+    );
+
+    endpoint.status = 'UP';
+    endpoint.currentIncidentId = null;
+    endpoint.consecutiveFailures = 0;
+    endpoint.consecutiveSuccesses = 1;
+    endpointMap.set(endpoint._id, endpoint);
+
+    // Build resolved incident object for email
+    const resolvedIncident = openIncident.toObject();
+    resolvedIncident.resolvedAt = now;
+    resolvedIncident.status = 'RESOLVED';
+
+    // Notify main thread → triggers recovery email + Socket.IO
+    parentPort.postMessage({
+      type: 'INCIDENT_RESOLVED',
+      endpointId: endpoint._id,
+      endpointName: endpoint.name,
+      incident: resolvedIncident,
+      ping: ping.toObject(),
+    });
+
+    console.log(`🟢 [Incident RESOLVED] ${endpoint.name} — back UP`);
+  } else {
+    // ──── Already healthy, normal ping ────
+    // Update consecutive counters
+    await Endpoint.updateOne(
+      { _id: endpointOid },
+      {
+        $inc: { consecutiveSuccesses: 1 },
+        $set: { consecutiveFailures: 0 },
+      }
+    );
+
+    endpoint.consecutiveSuccesses = (endpoint.consecutiveSuccesses || 0) + 1;
+    endpoint.consecutiveFailures = 0;
+    endpointMap.set(endpoint._id, endpoint);
+
+    parentPort.postMessage({
+      type: 'CHECK_OK',
+      endpointId: endpoint._id,
       endpointName: endpoint.name,
       ping: ping.toObject(),
     });
@@ -216,6 +425,10 @@ parentPort.on('message', (msg) => {
         ...ep,
         _id: epId,
         userId: typeof ep.userId === 'string' ? ep.userId : ep.userId.toString(),
+        currentIncidentId: null,
+        status: 'UP',
+        consecutiveFailures: 0,
+        consecutiveSuccesses: 0,
         lastChecked: 0, // Check immediately
       });
       console.log(`[Scheduler] Added endpoint: ${ep.name}`);

@@ -18,6 +18,15 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ error: 'Email, password, and name are required.' });
     }
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ error: 'Invalid email format.' });
+    }
+
+    if (name.trim().length < 2 || name.trim().length > 50) {
+      return res.status(400).json({ error: 'Name must be between 2 and 50 characters.' });
+    }
+
     if (password.length < 6) {
       return res.status(400).json({ error: 'Password must be at least 6 characters.' });
     }
@@ -61,6 +70,11 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ error: 'Email and password are required.' });
     }
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ error: 'Invalid email format.' });
+    }
+
     const user = await User.findOne({ email: email.toLowerCase() });
     if (!user) {
       return res.status(401).json({ error: 'Invalid email or password.' });
@@ -95,6 +109,10 @@ router.put('/password', auth, async (req, res) => {
 
     if (!currentPassword || !newPassword) {
       return res.status(400).json({ error: 'Current and new passwords are required.' });
+    }
+
+    if (newPassword === currentPassword) {
+      return res.status(400).json({ error: 'New password must be different from current password.' });
     }
 
     if (newPassword.length < 6) {

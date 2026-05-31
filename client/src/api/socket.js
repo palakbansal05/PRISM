@@ -1,7 +1,8 @@
 import { io } from 'socket.io-client';
 
-// Connect directly to the backend server (not through Vite proxy)
-const socket = io('http://localhost:5000', {
+// Connect to the backend server
+const socketUrl = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000';
+const socket = io(socketUrl, {
   autoConnect: false,
   reconnection: true,
   reconnectionDelay: 2000,
