@@ -12,7 +12,7 @@
 .latency-chart-header .card-title {
   font-size: 14px;
   font-weight: 600;
-  color: #fff;
+  color: var(--text-primary);
   margin: 0;
 }
 
@@ -32,10 +32,11 @@
   font-family: var(--font-sans);
   outline: none;
   cursor: pointer;
+  transition: background 0.3s, border-color 0.3s;
 }
 
 .latency-ep-select option {
-  background: var(--bg-void);
+  background: var(--bg-card);
   color: var(--text-primary);
 }
 
@@ -94,7 +95,7 @@
   border: 1px solid var(--border-light);
   border-radius: 8px;
   padding: 10px 14px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--card-shadow-lg);
 }
 
 .chart-tooltip-time {

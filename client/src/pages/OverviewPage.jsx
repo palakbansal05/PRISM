@@ -158,7 +158,7 @@ export default function OverviewPage() {
       label: 'TOTAL ENDPOINTS',
       value: stats.totalEndpoints,
       sub: 'Monitored',
-      subColor: '#00FF41',
+      colorClass: 'stat-color-green',
       icon: (
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
       ),
@@ -167,7 +167,7 @@ export default function OverviewPage() {
       label: 'OVERALL UPTIME',
       value: `${stats.overallUptimePercent}%`,
       sub: 'Last 24 hours',
-      subColor: '#00FF7F',
+      colorClass: 'stat-color-cyan',
       icon: (
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
       ),
@@ -176,7 +176,7 @@ export default function OverviewPage() {
       label: 'ACTIVE INCIDENTS',
       value: stats.activeIncidentsCount,
       sub: stats.activeIncidentsCount > 0 ? 'Needs attention' : 'All clear',
-      subColor: stats.activeIncidentsCount > 0 ? '#FF4757' : '#00FF7F',
+      colorClass: stats.activeIncidentsCount > 0 ? 'stat-color-red' : 'stat-color-green',
       icon: (
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
       ),
@@ -185,7 +185,7 @@ export default function OverviewPage() {
       label: 'AVG LATENCY',
       value: `${stats.avgLatency}ms`,
       sub: 'P50 (24h median)',
-      subColor: '#FFB647',
+      colorClass: 'stat-color-amber',
       icon: (
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
       ),
@@ -208,10 +208,10 @@ export default function OverviewPage() {
           <div className="stat-card" key={i}>
             <div className="stat-card-top">
               <span className="stat-card-label">{card.label}</span>
-              <div className="stat-card-icon" style={{ color: card.subColor }}>{card.icon}</div>
+              <div className={`stat-card-icon ${card.colorClass}`}>{card.icon}</div>
             </div>
             <div className="stat-card-value">{card.value}</div>
-            <div className="stat-card-sub" style={{ color: card.subColor }}>{card.sub}</div>
+            <div className={`stat-card-sub ${card.colorClass}`}>{card.sub}</div>
           </div>
         ))}
       </div>

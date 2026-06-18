@@ -6,9 +6,10 @@
 }
 
 .incidents-header h1 {
-  font-size: 22px;
-  font-weight: 700;
-  color: #fff;
+  font-family: var(--font-serif);
+  font-size: 26px;
+  font-weight: 400;
+  color: var(--text-primary);
   margin: 0;
 }
 
@@ -26,6 +27,8 @@
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 8px;
+  box-shadow: var(--card-shadow);
+  transition: background 0.3s, border-color 0.3s;
 }
 
 .incidents-empty {
@@ -54,7 +57,7 @@
 }
 
 .incident-row {
-  border-bottom: 1px solid rgba(26, 34, 64, 0.5);
+  border-bottom: 1px solid var(--border);
 }
 
 .incident-row-header {
@@ -86,7 +89,7 @@
 }
 
 .incident-row-main:hover {
-  background: rgba(0, 255, 65, 0.02);
+  background: var(--cyan-glow);
 }
 
 .incident-row-dot {
@@ -145,7 +148,7 @@
 .mini-spinner {
   width: 12px;
   height: 12px;
-  border: 2px solid rgba(0, 255, 65, 0.2);
+  border: 2px solid var(--border);
   border-top-color: var(--cyan);
   border-radius: 50%;
   animation: spin 0.6s linear infinite;
@@ -163,6 +166,7 @@
   align-items: center;
   gap: 24px;
   animation: slideDown 0.2s ease;
+  transition: background 0.3s, border-color 0.3s;
 }
 
 .inline-diff-row {
@@ -213,7 +217,7 @@
   margin: 0 14px 12px;
   padding: 8px 12px;
   background: var(--red-glow);
-  border: 1px solid rgba(255, 71, 87, 0.2);
+  border: 1px solid rgba(220, 38, 38, 0.15);
   border-radius: 6px;
   color: var(--red);
   font-size: 12px;
@@ -228,15 +232,15 @@
 }
 
 .incident-status-badge.active {
-  background: rgba(255, 71, 87, 0.15);
-  color: #FF4757;
-  border: 1px solid rgba(255, 71, 87, 0.3);
+  background: var(--red-glow);
+  color: var(--red);
+  border: 1px solid rgba(220, 38, 38, 0.2);
 }
 
 .incident-status-badge.resolved {
-  background: rgba(0, 237, 100, 0.15);
-  color: #00ED64;
-  border: 1px solid rgba(0, 237, 100, 0.3);
+  background: var(--green-glow);
+  color: var(--green);
+  border: 1px solid rgba(5, 150, 105, 0.2);
 }
 
 .incident-row-duration,

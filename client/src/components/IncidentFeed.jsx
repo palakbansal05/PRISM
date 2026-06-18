@@ -24,11 +24,14 @@ function formatDuration(startedAt, resolvedAt) {
 }
 
 export default function IncidentFeed({ incidents, onReplay }) {
+  // Only show the 5 most recent incidents to avoid crowding
+  const recentIncidents = incidents ? incidents.slice(0, 5) : [];
+
   return (
     <div className="incident-feed">
       <h3 className="card-title">Recent Incidents</h3>
       <div className="incident-feed-list">
-        {(!incidents || incidents.length === 0) ? (
+        {recentIncidents.length === 0 ? (
           <div className="incident-feed-empty">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#4B5563" strokeWidth="1.5">
               <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
@@ -37,7 +40,7 @@ export default function IncidentFeed({ incidents, onReplay }) {
             <p>No incidents — all clear!</p>
           </div>
         ) : (
-          incidents.map((inc) => {
+          recentIncidents.map((inc) => {
             const ep = inc.endpointId;
             const isActive = inc.status === 'ACTIVE';
             return (
@@ -48,14 +51,8 @@ export default function IncidentFeed({ incidents, onReplay }) {
                 <div className="incident-info">
                   <span className="incident-title">{ep?.name || 'Unknown Endpoint'}</span>
                   <span className="incident-meta">
-                    {isActive ? '🔴 ACTIVE' : '🟢 RESOLVED'} &middot;{' '}
-                    {timeAgo(inc.startedAt)} &middot;{' '}
-                    {formatDuration(inc.startedAt, inc.resolvedAt)} &middot;{' '}
-                    {inc.failureCount} failure{inc.failureCount !== 1 ? 's' : ''}
+                    {isActive ? 'Active' : 'Resolved'} · {timeAgo(inc.startedAt)} · {formatDuration(inc.startedAt, inc.resolvedAt)}
                   </span>
-                  {inc.reason && (
-                    <span className="incident-error-msg">{inc.reason}</span>
-                  )}
                 </div>
                 {ep?._id && (
                   <button

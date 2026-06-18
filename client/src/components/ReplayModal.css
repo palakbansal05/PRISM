@@ -1,7 +1,7 @@
 .replay-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.65);
+  background: var(--overlay-bg);
   backdrop-filter: blur(6px);
   display: flex;
   align-items: center;
@@ -17,8 +17,9 @@
   padding: 28px;
   width: 100%;
   max-width: 520px;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+  box-shadow: var(--card-shadow-lg);
   animation: slideUp 0.2s ease;
+  transition: background 0.3s, border-color 0.3s;
 }
 
 .replay-header {
@@ -31,7 +32,7 @@
 .replay-header h3 {
   font-size: 16px;
   font-weight: 700;
-  color: #fff;
+  color: var(--text-primary);
   margin: 0;
 }
 
@@ -48,7 +49,7 @@
 
 .replay-close:hover {
   color: var(--text-primary);
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--cyan-glow);
 }
 
 .replay-loading {
@@ -138,6 +139,7 @@
   border: 1px solid var(--border);
   border-radius: 10px;
   padding: 16px;
+  transition: background 0.3s, border-color 0.3s;
 }
 
 .replay-diff h4 {
@@ -191,7 +193,7 @@
   margin-top: 16px;
   padding: 10px 14px;
   background: var(--red-glow);
-  border: 1px solid rgba(255, 71, 87, 0.2);
+  border: 1px solid rgba(220, 38, 38, 0.15);
   border-radius: 8px;
   color: var(--red);
   font-size: 12px;

@@ -1,6 +1,7 @@
 const express = require('express');
 const Endpoint = require('../models/Endpoint');
 const Ping = require('../models/Ping');
+const Incident = require('../models/Incident');
 const auth = require('../middleware/auth');
 
 const router = express.Router();
@@ -120,8 +121,9 @@ router.delete('/:id', async (req, res) => {
       return res.status(404).json({ error: 'Endpoint not found.' });
     }
 
-    // Cascade delete all pings
+    // Cascade delete all pings and incidents
     await Ping.deleteMany({ endpointId: endpoint._id });
+    await Incident.deleteMany({ endpointId: endpoint._id });
     await Endpoint.deleteOne({ _id: endpoint._id });
 
     // Notify scheduler to stop monitoring

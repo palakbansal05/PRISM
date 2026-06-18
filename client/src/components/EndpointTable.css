@@ -44,12 +44,12 @@
 }
 
 .endpoint-table tbody tr:hover {
-  background: rgba(0, 255, 65, 0.02);
+  background: var(--cyan-glow);
 }
 
 .endpoint-table tbody td {
   padding: 12px;
-  border-bottom: 1px solid rgba(26, 34, 64, 0.5);
+  border-bottom: 1px solid var(--border);
   vertical-align: middle;
 }
 
@@ -92,7 +92,7 @@
 
 .status-badge.neutral {
   color: var(--text-tertiary);
-  background: rgba(90, 99, 128, 0.1);
+  background: var(--bg-elevated);
 }
 
 @keyframes subtlePulse {

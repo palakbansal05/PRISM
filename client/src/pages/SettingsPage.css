@@ -1,7 +1,8 @@
 .settings-page h1 {
-  font-size: 22px;
-  font-weight: 700;
-  color: #fff;
+  font-family: var(--font-serif);
+  font-size: 26px;
+  font-weight: 400;
+  color: var(--text-primary);
   margin: 0 0 24px 0;
 }
 
@@ -12,15 +13,147 @@
   padding: 24px;
   margin-bottom: 20px;
   max-width: 520px;
+  box-shadow: var(--card-shadow);
+  transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
 }
 
 .settings-card h3 {
-  font-size: 15px;
-  font-weight: 600;
-  color: #fff;
+  font-family: var(--font-serif);
+  font-size: 17px;
+  font-weight: 400;
+  color: var(--text-primary);
   margin: 0 0 20px 0;
 }
 
+/* ---- Appearance / Theme Toggle ---- */
+.settings-appearance {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.appearance-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.appearance-info {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.appearance-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--cyan-glow);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--cyan);
+  flex-shrink: 0;
+  transition: background 0.3s, color 0.3s;
+}
+
+.appearance-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.appearance-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.appearance-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* Premium Toggle Switch */
+.theme-toggle {
+  position: relative;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  outline: none;
+}
+
+.toggle-track {
+  display: flex;
+  align-items: center;
+  width: 52px;
+  height: 28px;
+  border-radius: 14px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  position: relative;
+  transition: background 0.3s ease, border-color 0.3s ease;
+  padding: 0 4px;
+  justify-content: space-between;
+}
+
+.theme-toggle.active .toggle-track {
+  background: var(--cyan-glow);
+  border-color: var(--cyan-dim);
+}
+
+.toggle-sun,
+.toggle-moon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  z-index: 1;
+  transition: opacity 0.3s, color 0.3s;
+}
+
+.toggle-sun {
+  color: var(--amber);
+  opacity: 1;
+}
+
+.toggle-moon {
+  color: var(--text-muted);
+  opacity: 0.4;
+}
+
+.theme-toggle.active .toggle-sun {
+  color: var(--text-muted);
+  opacity: 0.4;
+}
+
+.theme-toggle.active .toggle-moon {
+  color: var(--cyan);
+  opacity: 1;
+}
+
+.toggle-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--text-primary);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s;
+}
+
+.theme-toggle.active .toggle-thumb {
+  transform: translateX(24px);
+  background: var(--cyan);
+}
+
+/* ---- Profile ---- */
 .settings-profile {
   display: flex;
   align-items: center;
@@ -35,7 +168,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
+  color: var(--btn-primary-text);
   font-size: 18px;
   font-weight: 700;
   flex-shrink: 0;
@@ -65,6 +198,7 @@
   font-weight: 500;
 }
 
+/* ---- Messages ---- */
 .settings-msg {
   padding: 10px 14px;
   border-radius: 8px;
@@ -74,16 +208,17 @@
 
 .settings-msg.error {
   background: var(--red-glow);
-  border: 1px solid rgba(255, 71, 87, 0.25);
+  border: 1px solid rgba(220, 38, 38, 0.2);
   color: var(--red);
 }
 
 .settings-msg.success {
   background: var(--green-glow);
-  border: 1px solid rgba(0, 255, 127, 0.25);
+  border: 1px solid rgba(5, 150, 105, 0.2);
   color: var(--green);
 }
 
+/* ---- Form ---- */
 .settings-form-field {
   margin-bottom: 14px;
 }
@@ -106,7 +241,7 @@
   font-size: 13px;
   font-family: var(--font-sans);
   outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.3s;
   box-sizing: border-box;
 }
 
@@ -123,7 +258,7 @@
   padding: 9px 24px;
   background: var(--gradient-brand);
   background-size: 200% 200%;
-  color: #fff;
+  color: var(--btn-primary-text);
   font-size: 13px;
   font-weight: 600;
   font-family: var(--font-sans);
@@ -137,7 +272,7 @@
 
 .settings-submit:hover:not(:disabled) {
   transform: translateY(-1px);
-  box-shadow: 0 4px 20px rgba(0, 255, 65, 0.3);
+  box-shadow: 0 4px 20px var(--cyan-glow);
 }
 
 .settings-submit:disabled {

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;0,9..40,900;1,9..40,400&family=DM+Serif+Display&family=Source+Code+Pro:wght@400;500;600;700&display=swap');
 
 /* ---- Global Reset & Design Tokens ---- */
 *,
@@ -9,56 +9,152 @@
   box-sizing: border-box;
 }
 
-:root {
+/* ========================
+   LIGHT THEME (Default)
+   ======================== */
+:root,
+[data-theme="light"] {
   /* Backgrounds */
-  --bg-void: #001118;
-  --bg-primary: #001E2B;
-  --bg-card: #002B3D;
-  --bg-card-hover: #003B52;
-  --bg-elevated: #004B68;
-  --bg-sidebar: #001620;
+  --bg-void: #F2EFE9;
+  --bg-primary: #FAF8F5;
+  --bg-card: #FFFFFF;
+  --bg-card-hover: #F2EFE9;
+  --bg-elevated: #EBE7E0;
+  --bg-sidebar: #FAF8F5;
 
   /* Borders */
-  --border: #003D54;
-  --border-light: #005A7A;
-  --border-glow: rgba(0, 237, 100, 0.15);
+  --border: #E2DFD8;
+  --border-light: #D4D0C8;
+  --border-glow: rgba(0, 0, 0, 0.05);
 
   /* Text */
-  --text-primary: #E0F2F1;
-  --text-secondary: #B2DFDB;
-  --text-tertiary: #80CBC4;
-  --text-muted: #4DB6AC;
+  --text-primary: #1A1A1A;
+  --text-secondary: #333333;
+  --text-tertiary: #555555;
+  --text-muted: #888888;
+
+  /* Accent Colors — monochrome for monotonous feel */
+  --cyan: #1A1A1A;
+  --cyan-dim: #333333;
+  --cyan-glow: rgba(0, 0, 0, 0.04);
+  --purple: #1A1A1A;
+  --purple-dim: #333333;
+  --purple-glow: rgba(0, 0, 0, 0.04);
+  --blue: #1A1A1A;
+  --blue-glow: rgba(0, 0, 0, 0.04);
+
+  /* Status */
+  --green: #059669;
+  --green-dim: #047857;
+  --green-glow: rgba(5, 150, 105, 0.08);
+  --red: #DC2626;
+  --red-dim: #B91C1C;
+  --red-glow: rgba(220, 38, 38, 0.07);
+  --amber: #D97706;
+  --amber-dim: #B45309;
+  --amber-glow: rgba(217, 119, 6, 0.07);
+
+  /* Typography */
+  --font-sans: 'Euclid Circular A', 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-serif: 'MongoDB Value Serif', 'DM Serif Display', Georgia, serif;
+  --font-mono: 'Source Code Pro', 'Fira Code', 'Consolas', monospace;
+
+  /* Gradients */
+  --gradient-brand: linear-gradient(135deg, #1A1A1A, #333333);
+  --gradient-brand-hover: linear-gradient(135deg, #333333, #555555);
+  --gradient-card: linear-gradient(180deg, rgba(0, 0, 0, 0.02) 0%, transparent 100%);
+  --gradient-sidebar: linear-gradient(180deg, #FFFFFF 0%, #FAF8F5 100%);
+
+  /* Light-specific */
+  --overlay-bg: rgba(0, 0, 0, 0.2);
+  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --card-shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
+  --grid-color: rgba(0, 0, 0, 0.03);
+  --selection-bg: rgba(0, 0, 0, 0.1);
+  --selection-color: #1A1A1A;
+  --landing-orb-1: rgba(0, 0, 0, 0.02);
+  --landing-orb-2: rgba(0, 0, 0, 0.02);
+  --landing-orb-3: rgba(0, 0, 0, 0.02);
+  --snippet-bg: #F2EFE9;
+  --snippet-header-bg: #EBE7E0;
+  --snippet-text: #1A1A1A;
+  --snippet-border: #E2DFD8;
+  --code-keyword-color: #1A1A1A;
+  --code-string-color: #333333;
+  --btn-primary-text: #FFFFFF;
+  --auth-card-bg: rgba(255, 255, 255, 0.95);
+  --auth-card-shadow: 0 20px 60px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+/* ========================
+   DARK THEME
+   ======================== */
+[data-theme="dark"] {
+  /* Backgrounds */
+  --bg-void: #0D0D0D;
+  --bg-primary: #141414;
+  --bg-card: #1A1A1A;
+  --bg-card-hover: #222222;
+  --bg-elevated: #2A2A2A;
+  --bg-sidebar: #121212;
+
+  /* Borders */
+  --border: #2A2A2A;
+  --border-light: #333333;
+  --border-glow: rgba(255, 255, 255, 0.05);
+
+  /* Text */
+  --text-primary: #F0F0F0;
+  --text-secondary: #CCCCCC;
+  --text-tertiary: #AAAAAA;
+  --text-muted: #777777;
 
   /* Accent Colors */
-  --cyan: #00ED64;
-  --cyan-dim: #00C853;
-  --cyan-glow: rgba(0, 237, 100, 0.15);
-  --purple: #00B4D8;
-  --purple-dim: #0096C7;
-  --purple-glow: rgba(0, 180, 216, 0.15);
-  --blue: #48CAE4;
-  --blue-glow: rgba(72, 202, 228, 0.15);
+  --cyan: #FFFFFF;
+  --cyan-dim: #CCCCCC;
+  --cyan-glow: rgba(255, 255, 255, 0.1);
+  --purple: #FFFFFF;
+  --purple-dim: #CCCCCC;
+  --purple-glow: rgba(255, 255, 255, 0.1);
+  --blue: #FFFFFF;
+  --blue-glow: rgba(255, 255, 255, 0.1);
 
   /* Status */
   --green: #00ED64;
   --green-dim: #00C853;
-  --green-glow: rgba(0, 237, 100, 0.12);
+  --green-glow: rgba(0, 237, 100, 0.14);
   --red: #FF4757;
   --red-dim: #DC2626;
-  --red-glow: rgba(255, 71, 87, 0.12);
+  --red-glow: rgba(255, 71, 87, 0.14);
   --amber: #FFB647;
   --amber-dim: #D97706;
-  --amber-glow: rgba(255, 182, 71, 0.12);
-
-  /* Typography */
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+  --amber-glow: rgba(255, 182, 71, 0.14);
 
   /* Gradients */
-  --gradient-brand: linear-gradient(135deg, #00ED64, #00B4D8);
-  --gradient-brand-hover: linear-gradient(135deg, #00FF7A, #48CAE4);
-  --gradient-card: linear-gradient(180deg, rgba(0, 237, 100, 0.05) 0%, transparent 100%);
-  --gradient-sidebar: linear-gradient(180deg, #00121A 0%, #001C29 100%);
+  --gradient-brand: linear-gradient(135deg, #FFFFFF, #CCCCCC);
+  --gradient-brand-hover: linear-gradient(135deg, #CCCCCC, #AAAAAA);
+  --gradient-card: linear-gradient(180deg, rgba(255, 255, 255, 0.02) 0%, transparent 100%);
+  --gradient-sidebar: linear-gradient(180deg, #1A1A1A 0%, #121212 100%);
+
+  /* Dark-specific */
+  --overlay-bg: rgba(0, 0, 0, 0.8);
+  --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  --card-shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.8), 0 0 80px rgba(255, 255, 255, 0.02);
+  --grid-color: rgba(255, 255, 255, 0.02);
+  --selection-bg: rgba(255, 255, 255, 0.15);
+  --selection-color: #fff;
+  --landing-orb-1: rgba(255, 255, 255, 0.02);
+  --landing-orb-2: rgba(255, 255, 255, 0.02);
+  --landing-orb-3: rgba(255, 255, 255, 0.02);
+  --snippet-bg: #1A1A1A;
+  --snippet-header-bg: #222222;
+  --snippet-text: #F0F0F0;
+  --snippet-border: #2A2A2A;
+  --code-keyword-color: #FFFFFF;
+  --code-string-color: #CCCCCC;
+  --btn-primary-text: #000;
+  --auth-card-bg: rgba(26, 26, 26, 0.95);
+  --auth-card-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 80px rgba(255, 255, 255, 0.02);
 }
 
 html {
@@ -74,9 +170,10 @@ body {
   line-height: 1.5;
   min-height: 100vh;
   background-image:
-    linear-gradient(rgba(0, 237, 100, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 237, 100, 0.05) 1px, transparent 1px);
+    linear-gradient(var(--grid-color) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
   background-size: 60px 60px;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 #root {
@@ -112,8 +209,8 @@ button {
 }
 
 ::selection {
-  background: rgba(0, 255, 65, 0.25);
-  color: #fff;
+  background: var(--selection-bg);
+  color: var(--selection-color);
 }
 
 /* ---- Shared Animations ---- */

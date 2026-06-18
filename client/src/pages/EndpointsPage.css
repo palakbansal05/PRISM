@@ -8,9 +8,10 @@
 }
 
 .endpoints-header h1 {
-  font-size: 22px;
-  font-weight: 700;
-  color: #fff;
+  font-family: var(--font-serif);
+  font-size: 26px;
+  font-weight: 400;
+  color: var(--text-primary);
   margin: 0;
 }
 
@@ -20,7 +21,7 @@
   gap: 6px;
   background: var(--gradient-brand);
   background-size: 200% 200%;
-  color: #fff;
+  color: var(--btn-primary-text);
   font-size: 13px;
   font-weight: 600;
   font-family: var(--font-sans);
@@ -34,7 +35,7 @@
 
 .add-endpoint-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 20px rgba(0, 255, 65, 0.3);
+  box-shadow: 0 4px 20px var(--cyan-glow);
 }
 
 .endpoints-table-card {
@@ -42,13 +43,15 @@
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 20px;
+  box-shadow: var(--card-shadow);
+  transition: background 0.3s, border-color 0.3s;
 }
 
 /* ---- Modal ---- */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.65);
+  background: var(--overlay-bg);
   backdrop-filter: blur(6px);
   display: flex;
   align-items: center;
@@ -66,8 +69,9 @@
   max-width: 500px;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6), 0 0 80px rgba(0, 255, 65, 0.03);
+  box-shadow: var(--card-shadow-lg);
   animation: slideUp 0.2s ease;
+  transition: background 0.3s, border-color 0.3s;
 }
 
 .modal-header {
@@ -78,9 +82,10 @@
 }
 
 .modal-header h3 {
-  font-size: 16px;
-  font-weight: 700;
-  color: #fff;
+  font-family: var(--font-serif);
+  font-size: 18px;
+  font-weight: 400;
+  color: var(--text-primary);
   margin: 0;
 }
 
@@ -97,12 +102,12 @@
 
 .modal-close:hover {
   color: var(--text-primary);
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--cyan-glow);
 }
 
 .modal-error {
   background: var(--red-glow);
-  border: 1px solid rgba(255, 71, 87, 0.25);
+  border: 1px solid rgba(220, 38, 38, 0.2);
   color: var(--red);
   padding: 10px 14px;
   border-radius: 8px;
@@ -152,7 +157,7 @@
   font-size: 13px;
   font-family: var(--font-sans);
   outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.3s;
   resize: vertical;
   box-sizing: border-box;
   width: 100%;
@@ -175,7 +180,7 @@
 }
 
 .modal-field select option {
-  background: var(--bg-void);
+  background: var(--bg-card);
   color: var(--text-primary);
 }
 
@@ -184,7 +189,7 @@
   padding: 10px;
   background: var(--gradient-brand);
   background-size: 200% 200%;
-  color: #fff;
+  color: var(--btn-primary-text);
   font-size: 13.5px;
   font-weight: 600;
   font-family: var(--font-sans);
@@ -198,7 +203,7 @@
 
 .modal-submit:hover:not(:disabled) {
   transform: translateY(-1px);
-  box-shadow: 0 4px 20px rgba(0, 255, 65, 0.3);
+  box-shadow: 0 4px 20px var(--cyan-glow);
 }
 
 .modal-submit:disabled {

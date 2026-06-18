@@ -8,9 +8,10 @@
 }
 
 .overview-header h1 {
-  font-size: 22px;
-  font-weight: 700;
-  color: #fff;
+  font-family: var(--font-serif);
+  font-size: 26px;
+  font-weight: 400;
+  color: var(--text-primary);
   margin: 0;
 }
 
@@ -22,7 +23,7 @@
   font-weight: 600;
   color: var(--green);
   background: var(--green-glow);
-  border: 1px solid rgba(0, 255, 127, 0.15);
+  border: 1px solid rgba(5, 150, 105, 0.15);
   padding: 5px 14px;
   border-radius: 20px;
 }
@@ -33,18 +34,18 @@
   background: var(--green);
   border-radius: 50%;
   animation: pulse 2s ease-in-out infinite;
-  box-shadow: 0 0 8px rgba(0, 255, 127, 0.5);
+  box-shadow: 0 0 8px var(--green-glow);
 }
 
 .overview-live-badge.disconnected {
   color: var(--amber);
   background: var(--amber-glow);
-  border-color: rgba(255, 182, 71, 0.15);
+  border-color: rgba(217, 119, 6, 0.15);
 }
 
 .overview-live-badge.disconnected .pulse-dot {
   background: var(--amber);
-  box-shadow: 0 0 8px rgba(255, 182, 71, 0.5);
+  box-shadow: 0 0 8px var(--amber-glow);
 }
 
 /* ---- Stat Cards Grid ---- */
@@ -65,7 +66,8 @@
   gap: 2px;
   position: relative;
   overflow: hidden;
-  transition: border-color 0.2s, transform 0.2s;
+  transition: border-color 0.2s, transform 0.2s, background 0.3s, box-shadow 0.3s;
+  box-shadow: var(--card-shadow);
 }
 
 .stat-card::before {
@@ -110,7 +112,7 @@
 .stat-card-value {
   font-size: 28px;
   font-weight: 800;
-  color: #fff;
+  color: var(--text-primary);
   line-height: 1.2;
   letter-spacing: -0.5px;
 }
@@ -133,12 +135,15 @@
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 20px;
+  box-shadow: var(--card-shadow);
+  transition: background 0.3s, border-color 0.3s;
 }
 
 .overview-table-card .card-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: #fff;
+  font-family: var(--font-serif);
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--text-primary);
   margin: 0 0 14px 0;
 }
 

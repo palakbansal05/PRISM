@@ -15,60 +15,43 @@ export default function LandingPage() {
       {/* Navigation */}
       <nav className="landing-nav">
         <div className="landing-nav-brand">
-          <div className="nav-prism-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="url(#navGrad)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <defs>
-                <linearGradient id="navGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#FFFFFF" />
-                  <stop offset="100%" stopColor="#00B4D8" />
-                </linearGradient>
-              </defs>
-              <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
-            </svg>
-          </div>
           <span>PRISM</span>
         </div>
+        
+        <div className="landing-nav-center">
+          <Link to="#about" className="nav-link-item">About Us</Link>
+          <div className="nav-dropdown">
+            <span className="nav-link-item">Why <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+          </div>
+        </div>
+
         <div className="landing-nav-links">
           <Link to="/login" className="nav-link-login">Sign In</Link>
           <Link to="/register" className="nav-link-register">Get Started</Link>
         </div>
       </nav>
 
-      {/* Hero */}
-      <section className="landing-hero">
-        <div className="hero-badge">
-          <span className="hero-badge-dot"></span>
-          Reliable API Monitoring
+      {/* Hero Split Layout */}
+      <section className="landing-hero-split">
+        <div className="hero-left">
+          <h1 className="hero-title-large">
+            API <span className="highlight-underline">monitoring</span> and <br/>
+            <span className="highlight-underline">insights</span> that put <br/>
+            reliability at the frontier
+          </h1>
         </div>
-
-        <h1 className="hero-title">
-          <span className="hero-title-prism">PRISM</span>
-        </h1>
-        <p className="hero-fullform">
-          <span className="ff-letter">P</span>roactive{' '}
-          <span className="ff-letter">R</span>equest{' '}
-          <span className="ff-letter">I</span>nspection &{' '}
-          <span className="ff-letter">S</span>tatus{' '}
-          <span className="ff-letter">M</span>onitor
-        </p>
-
-        <p className="hero-description">
-          Monitor your APIs in real-time. Track uptime, latency percentiles, 
-          and replay failed requests instantly. Get notified before your users 
-          even notice an outage.
-        </p>
-
-        <div className="hero-cta">
-          <Link to="/register" className="cta-primary">
-            Start Monitoring
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <line x1="5" y1="12" x2="19" y2="12" />
-              <polyline points="12 5 19 12 12 19" />
-            </svg>
-          </Link>
-          <Link to="/login" className="cta-secondary">
-            Sign In
-          </Link>
+        <div className="hero-right">
+          <p className="hero-description-side">
+            APIs have a vast impact on the world. PRISM is a dedicated monitoring tool built to secure your endpoints' uptime and mitigate downtime risks in real-time.
+          </p>
+          <div className="hero-cta-side">
+            <Link to="/register" className="cta-primary">
+              Start Monitoring
+            </Link>
+            <Link to="/login" className="cta-secondary">
+              Sign In
+            </Link>
+          </div>
         </div>
       </section>
 

@@ -3,6 +3,8 @@
 logs
 *.log
 npm-debug.log*
+*.md
+!README.md
 
 # Environment variables
 .env
