@@ -31,6 +31,17 @@ const endpointSchema = new mongoose.Schema({
     default: 60,
     min: 10,
   },
+  // ---- Performance & Timeout Config ----
+  expectedResponseMs: {
+    type: Number,
+    default: 5000,   // 5 seconds — if response takes longer, mark DEGRADED
+    min: 500,
+  },
+  timeoutSeconds: {
+    type: Number,
+    default: 60,     // User-specified timeout (clamped in worker to 60–100s)
+    min: 10,
+  },
   headers: {
     type: Object,
     default: {},
@@ -55,7 +66,7 @@ const endpointSchema = new mongoose.Schema({
   // ---- State Machine Fields ----
   status: {
     type: String,
-    enum: ['UP', 'DOWN'],
+    enum: ['UP', 'DOWN', 'DEGRADED'],
     default: 'UP',
   },
   consecutiveFailures: {

@@ -1,20 +1,23 @@
 /**
- * Scheduler Worker Thread — Incident State Machine
+ * Scheduler Worker Thread — Incident & Performance State Machine
  * 
  * Runs in a separate thread so health check HTTP requests never block
  * the Express event loop.
  * 
- * STATE MACHINE LOGIC:
- * ────────────────────
- * On failure:
+ * STATE MACHINE LOGIC (3 states: UP, DEGRADED, DOWN):
+ * ─────────────────────────────────────────────────────
+ * On failure (error / timeout / wrong status code):
  *   1. Check if OPEN incident exists for this endpoint
  *   2. If NO open incident  → Create incident, mark DOWN, notify main thread (sends email)
  *   3. If OPEN incident exists → Update failureCount & lastCheckedAt only (NO new incident, NO email)
  * 
- * On success:
- *   1. Check if OPEN incident exists for this endpoint
- *   2. If OPEN incident exists → Resolve it, mark UP, notify main thread (sends recovery email)
- *   3. If no open incident → Normal OK ping update
+ * On success (correct status code):
+ *   1. Check if OPEN incident exists → Resolve it, mark UP, send recovery email
+ *   2. If latency > expectedResponseMs and status was UP → mark DEGRADED, send slow email
+ *   3. If latency <= expectedResponseMs and status was DEGRADED → mark UP, send perf recovery
+ *   4. Otherwise → Normal OK ping update
+ * 
+ * TIMEOUT CLAMPING: effectiveTimeout = min(100, max(60, endpoint.timeoutSeconds))
  */
 
 const { parentPort, workerData } = require('worker_threads');
@@ -39,13 +42,15 @@ async function connectDB() {
     method: { type: String, default: 'GET' },
     expectedStatus: { type: Number, default: 200 },
     intervalSeconds: { type: Number, default: 60 },
+    expectedResponseMs: { type: Number, default: 5000 },
+    timeoutSeconds: { type: Number, default: 60 },
     headers: { type: Object, default: {} },
     body: { type: String, default: null },
     alertEmail: { type: String, default: null },
     isActive: { type: Boolean, default: true },
     lastChecked: { type: Date, default: null },
     // State machine fields
-    status: { type: String, enum: ['UP', 'DOWN'], default: 'UP' },
+    status: { type: String, enum: ['UP', 'DOWN', 'DEGRADED'], default: 'UP' },
     consecutiveFailures: { type: Number, default: 0 },
     consecutiveSuccesses: { type: Number, default: 0 },
     currentIncidentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Incident', default: null },
@@ -132,13 +137,17 @@ async function executeCheck(endpoint) {
   const userOid = new mongoose.Types.ObjectId(endpoint.userId);
   let ping;
 
+  // Clamped timeout: min(100, max(60, userTimeout)) * 1000
+  const userTimeout = endpoint.timeoutSeconds || 60;
+  const effectiveTimeoutMs = Math.min(100, Math.max(60, userTimeout)) * 1000;
+
   try {
     const response = await axios({
       method: endpoint.method || 'GET',
       url: endpoint.url,
       headers: endpoint.headers || {},
       data: endpoint.body || undefined,
-      timeout: 15000,
+      timeout: effectiveTimeoutMs,
       validateStatus: () => true, // Accept any status to record the actual code
     });
 
@@ -172,9 +181,11 @@ async function executeCheck(endpoint) {
     await ping.save();
 
     if (!success) {
+      // Wrong status code → treat as failure (DOWN)
       await handleFailure(endpoint, ping, response.status);
     } else {
-      await handleSuccess(endpoint, ping);
+      // Correct status code → evaluate performance
+      await handleSuccess(endpoint, ping, latencyMs);
     }
   } catch (err) {
     const latencyMs = Date.now() - startTime;
@@ -307,9 +318,11 @@ async function handleFailure(endpoint, ping, statusCode, errorMsg) {
  * Case 1: Open incident exists → Resolve it, send recovery email
  * Case 2: No open incident → Normal OK ping
  */
-async function handleSuccess(endpoint, ping) {
+async function handleSuccess(endpoint, ping, latencyMs) {
   const endpointOid = new mongoose.Types.ObjectId(endpoint._id);
   const now = new Date();
+  const expectedResponseMs = endpoint.expectedResponseMs || 5000;
+  const isSlow = latencyMs > expectedResponseMs;
 
   // Check if there is an OPEN incident for this endpoint
   const openIncident = await Incident.findOne({
@@ -318,8 +331,7 @@ async function handleSuccess(endpoint, ping) {
   });
 
   if (openIncident) {
-    // ──── FAILED → HEALTHY transition ────
-    // Resolve the incident
+    // ──── DOWN → UP transition (incident resolved) ────
     await Incident.updateOne(
       { _id: openIncident._id },
       {
@@ -331,12 +343,14 @@ async function handleSuccess(endpoint, ping) {
       }
     );
 
-    // Update endpoint status back to UP
+    // Determine new status: if response was slow, go to DEGRADED not UP
+    const newStatus = isSlow ? 'DEGRADED' : 'UP';
+
     await Endpoint.updateOne(
       { _id: endpointOid },
       {
         $set: {
-          status: 'UP',
+          status: newStatus,
           currentIncidentId: null,
           consecutiveFailures: 0,
           consecutiveSuccesses: 1,
@@ -344,7 +358,7 @@ async function handleSuccess(endpoint, ping) {
       }
     );
 
-    endpoint.status = 'UP';
+    endpoint.status = newStatus;
     endpoint.currentIncidentId = null;
     endpoint.consecutiveFailures = 0;
     endpoint.consecutiveSuccesses = 1;
@@ -364,10 +378,80 @@ async function handleSuccess(endpoint, ping) {
       ping: ping.toObject(),
     });
 
-    console.log(`🟢 [Incident RESOLVED] ${endpoint.name} — back UP`);
+    // If it recovered from DOWN but is still slow, also notify about degradation
+    if (isSlow) {
+      parentPort.postMessage({
+        type: 'PERFORMANCE_DEGRADED',
+        endpointId: endpoint._id,
+        endpointName: endpoint.name,
+        ping: ping.toObject(),
+        latencyMs,
+        expectedResponseMs,
+      });
+      console.log(`⚠️ [DEGRADED] ${endpoint.name} — ${latencyMs}ms (expected ${expectedResponseMs}ms)`);
+    }
+
+    console.log(`🟢 [Incident RESOLVED] ${endpoint.name} — back ${newStatus}`);
+  } else if (isSlow && endpoint.status !== 'DEGRADED') {
+    // ──── UP → DEGRADED transition (slow but alive) ────
+    // Only trigger on state CHANGE (UP → DEGRADED), not when already DEGRADED
+    await Endpoint.updateOne(
+      { _id: endpointOid },
+      {
+        $set: {
+          status: 'DEGRADED',
+          consecutiveFailures: 0,
+        },
+        $inc: { consecutiveSuccesses: 1 },
+      }
+    );
+
+    endpoint.status = 'DEGRADED';
+    endpoint.consecutiveSuccesses = (endpoint.consecutiveSuccesses || 0) + 1;
+    endpoint.consecutiveFailures = 0;
+    endpointMap.set(endpoint._id, endpoint);
+
+    // Notify main thread → triggers slow email + Socket.IO
+    parentPort.postMessage({
+      type: 'PERFORMANCE_DEGRADED',
+      endpointId: endpoint._id,
+      endpointName: endpoint.name,
+      ping: ping.toObject(),
+      latencyMs,
+      expectedResponseMs,
+    });
+
+    console.log(`⚠️ [DEGRADED] ${endpoint.name} — ${latencyMs}ms (expected ${expectedResponseMs}ms)`);
+  } else if (!isSlow && endpoint.status === 'DEGRADED') {
+    // ──── DEGRADED → UP transition (performance recovered) ────
+    await Endpoint.updateOne(
+      { _id: endpointOid },
+      {
+        $set: {
+          status: 'UP',
+          consecutiveFailures: 0,
+        },
+        $inc: { consecutiveSuccesses: 1 },
+      }
+    );
+
+    endpoint.status = 'UP';
+    endpoint.consecutiveSuccesses = (endpoint.consecutiveSuccesses || 0) + 1;
+    endpoint.consecutiveFailures = 0;
+    endpointMap.set(endpoint._id, endpoint);
+
+    parentPort.postMessage({
+      type: 'PERFORMANCE_RECOVERED',
+      endpointId: endpoint._id,
+      endpointName: endpoint.name,
+      ping: ping.toObject(),
+      latencyMs,
+      expectedResponseMs,
+    });
+
+    console.log(`🟢 [PERF RECOVERED] ${endpoint.name} — ${latencyMs}ms (within ${expectedResponseMs}ms)`);
   } else {
-    // ──── Already healthy, normal ping ────
-    // Update consecutive counters
+    // ──── Steady state (already UP and fast, or already DEGRADED and still slow) ────
     await Endpoint.updateOne(
       { _id: endpointOid },
       {

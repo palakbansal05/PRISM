@@ -12,6 +12,8 @@ export default function EndpointsPage() {
     method: 'GET',
     expectedStatus: 200,
     intervalSeconds: 60,
+    expectedResponseMs: 5000,
+    timeoutSeconds: 60,
     headers: '',
     body: '',
     alertEmail: '',
@@ -42,6 +44,8 @@ export default function EndpointsPage() {
         ...form,
         expectedStatus: Number(form.expectedStatus),
         intervalSeconds: Number(form.intervalSeconds),
+        expectedResponseMs: Number(form.expectedResponseMs),
+        timeoutSeconds: Number(form.timeoutSeconds),
         headers: form.headers || '{}',
       });
       setShowModal(false);
@@ -51,6 +55,8 @@ export default function EndpointsPage() {
         method: 'GET',
         expectedStatus: 200,
         intervalSeconds: 60,
+        expectedResponseMs: 5000,
+        timeoutSeconds: 60,
         headers: '',
         body: '',
         alertEmail: '',
@@ -143,6 +149,26 @@ export default function EndpointsPage() {
                     <option value="60">Every 1 minute</option>
                     <option value="300">Every 5 minutes</option>
                     <option value="600">Every 10 minutes</option>
+                  </select>
+                </div>
+              </div>
+              <div className="modal-row two-col">
+                <div className="modal-field">
+                  <label>Expected Response Time</label>
+                  <select value={form.expectedResponseMs} onChange={updateField('expectedResponseMs')}>
+                    <option value="1000">1 second</option>
+                    <option value="2000">2 seconds</option>
+                    <option value="5000">5 seconds</option>
+                    <option value="10000">10 seconds</option>
+                    <option value="30000">30 seconds</option>
+                  </select>
+                </div>
+                <div className="modal-field">
+                  <label>Timeout (Down Threshold)</label>
+                  <select value={form.timeoutSeconds} onChange={updateField('timeoutSeconds')}>
+                    <option value="60">60 seconds</option>
+                    <option value="80">80 seconds</option>
+                    <option value="100">100 seconds</option>
                   </select>
                 </div>
               </div>

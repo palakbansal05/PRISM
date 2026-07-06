@@ -40,7 +40,7 @@ router.get('/', async (req, res) => {
  */
 router.post('/', async (req, res) => {
   try {
-    const { name, url, method, expectedStatus, intervalSeconds, headers, body, alertEmail } =
+    const { name, url, method, expectedStatus, intervalSeconds, headers, body, alertEmail, expectedResponseMs, timeoutSeconds } =
       req.body;
 
     if (!name || !url) {
@@ -70,6 +70,16 @@ router.post('/', async (req, res) => {
       }
     }
 
+    // Validate expectedResponseMs (500ms to 60s)
+    if (expectedResponseMs !== undefined && (expectedResponseMs < 500 || expectedResponseMs > 60000)) {
+      return res.status(400).json({ error: 'Expected response time must be between 500ms and 60000ms.' });
+    }
+
+    // Validate timeoutSeconds (10s to 300s — clamped further in worker)
+    if (timeoutSeconds !== undefined && (timeoutSeconds < 10 || timeoutSeconds > 300)) {
+      return res.status(400).json({ error: 'Timeout must be between 10 and 300 seconds.' });
+    }
+
     // Parse headers if it's a string
     let parsedHeaders = headers || {};
     if (typeof headers === 'string') {
@@ -87,6 +97,8 @@ router.post('/', async (req, res) => {
       method: method || 'GET',
       expectedStatus: expectedStatus || 200,
       intervalSeconds: intervalSeconds || 60,
+      expectedResponseMs: expectedResponseMs || 5000,
+      timeoutSeconds: timeoutSeconds || 60,
       headers: parsedHeaders,
       body: body || null,
       alertEmail: alertEmail || null,

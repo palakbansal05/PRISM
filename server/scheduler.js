@@ -101,6 +101,43 @@ function start() {
           });
         }
         break;
+
+      // ──── PERFORMANCE DEGRADED (UP → DEGRADED) ────
+      case 'PERFORMANCE_DEGRADED':
+        if (global.io) {
+          global.io.emit('performance:degraded', {
+            endpointId: msg.endpointId,
+            endpointName: msg.endpointName,
+            ping: msg.ping,
+            latencyMs: msg.latencyMs,
+            expectedResponseMs: msg.expectedResponseMs,
+          });
+        }
+
+        // Send ONE degraded alert email (only fires on state change)
+        try {
+          const endpoint = await Endpoint.findById(msg.endpointId);
+          if (endpoint && endpoint.alertEmail) {
+            await mailer.sendDegradedAlert(endpoint, msg.ping);
+          }
+        } catch (err) {
+          console.error('Degraded alert dispatch error:', err.message);
+        }
+        break;
+
+      // ──── PERFORMANCE RECOVERED (DEGRADED → UP) ────
+      case 'PERFORMANCE_RECOVERED':
+        if (global.io) {
+          global.io.emit('performance:recovered', {
+            endpointId: msg.endpointId,
+            endpointName: msg.endpointName,
+            ping: msg.ping,
+            latencyMs: msg.latencyMs,
+            expectedResponseMs: msg.expectedResponseMs,
+          });
+        }
+        // No email for performance recovery — just socket update
+        break;
     }
   });
 
