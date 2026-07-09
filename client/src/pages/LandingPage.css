@@ -161,6 +161,7 @@
 
 .hero-left {
   flex: 1.2;
+  transform: translateY(-58px);
 }
 
 .hero-right {
@@ -168,6 +169,7 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
+  transform: translateY(-58px);
 }
 
 .hero-title-large {
@@ -405,6 +407,10 @@
     flex: 1;
     width: 100%;
   }
+  .hero-left,
+  .hero-right {
+    transform: none;
+  }
 }
 
 @media (max-width: 900px) {
@@ -512,7 +518,7 @@
 .prism-endpoint-node {
   right: 32px;
   bottom: 32px;
-  animation: prismEndpointState 10s ease-in-out infinite;
+  animation: prismEndpointState 14s ease-in-out infinite;
 }
 
 .prism-warning-badge {
@@ -530,7 +536,7 @@
   font-weight: 900;
   opacity: 0;
   transform: scale(0.7);
-  animation: prismWarningFlash 10s ease-in-out infinite;
+  animation: prismWarningFlash 14s ease-in-out infinite;
 }
 
 .prism-packet {
@@ -552,7 +558,7 @@
   top: 156px;
   left: 66px;
   width: 82px;
-  animation: prismRegisterFlow 10s cubic-bezier(0.45, 0, 0.2, 1) infinite;
+  animation: prismRegisterFlow 14s cubic-bezier(0.45, 0, 0.2, 1) infinite;
 }
 
 .prism-request-packet,
@@ -565,7 +571,7 @@
 .prism-request-packet {
   top: 132px;
   background: #28b783;
-  animation: prismRequestFlow 10s ease-in-out infinite;
+  animation: prismRequestFlow 14s ease-in-out infinite;
 }
 
 .prism-bad-request-packet {
@@ -578,13 +584,13 @@
 
 .prism-good-response-packet {
   background: #28b783;
-  animation: prismGoodResponseFlow 10s ease-in-out infinite;
+  animation: prismGoodResponseFlow 14s ease-in-out infinite;
 }
 
 .prism-bad-response-packet {
   top: 224px;
   background: #ee513d;
-  animation: prismBadResponseFlow 10s ease-in-out infinite;
+  animation: prismBadResponseFlow 14s ease-in-out infinite;
 }
 
 .prism-alert-packet {
@@ -593,7 +599,7 @@
   width: 92px;
   height: 34px;
   background: #ee513d;
-  animation: prismAlertFlow 10s cubic-bezier(0.45, 0, 0.2, 1) infinite;
+  animation: prismAlertFlow 14s cubic-bezier(0.45, 0, 0.2, 1) infinite;
 }
 
 @keyframes prismHeroPulse {
@@ -634,8 +640,8 @@
 }
 
 @keyframes prismAlertFlow {
-  0%, 92% { left: calc(100% - 218px); top: 94px; opacity: 0; transform: scale(0.82); }
-  94%, 96% { left: calc(100% - 218px); top: 94px; opacity: 1; transform: scale(1); }
+  0%, 91% { left: calc(100% - 218px); top: 94px; opacity: 0; transform: scale(0.82); }
+  92%, 94% { left: calc(100% - 218px); top: 94px; opacity: 1; transform: scale(1); }
   99% { left: 66px; top: 156px; opacity: 1; transform: scale(1); }
   100% { left: 66px; top: 156px; opacity: 0; transform: scale(1); }
 }
@@ -766,8 +772,8 @@
 }
 
 @keyframes prismAlertFlowMobile {
-  0%, 92% { top: 178px; left: calc(50% - 41px); opacity: 0; transform: scale(0.82); }
-  94%, 96% { top: 178px; left: calc(50% - 41px); opacity: 1; transform: scale(1); }
+  0%, 91% { top: 178px; left: calc(50% - 41px); opacity: 0; transform: scale(0.82); }
+  92%, 94% { top: 178px; left: calc(50% - 41px); opacity: 1; transform: scale(1); }
   99% { top: 48px; left: calc(50% - 41px); opacity: 1; transform: scale(1); }
   100% { top: 48px; left: calc(50% - 41px); opacity: 0; transform: scale(1); }
 }
