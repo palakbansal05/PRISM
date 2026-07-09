@@ -41,9 +41,35 @@ export default function LandingPage() {
           </h1>
         </div>
         <div className="hero-right">
-          <p className="hero-description-side">
-            APIs have a vast impact on the world. PRISM is a dedicated monitoring tool built to secure your endpoints' uptime and mitigate downtime risks in real-time.
-          </p>
+          <div className="prism-network-animation" aria-label="API monitoring animation">
+            <div className="prism-network-grid" aria-hidden="true"></div>
+
+            <div className="prism-node-card prism-client-node">
+              <span className="prism-node-icon">CLI</span>
+              <strong>Client</strong>
+              <small>register endpoint</small>
+            </div>
+
+            <div className="prism-node-card prism-prism-node">
+              <span className="prism-mark">P</span>
+              <strong>PRISM</strong>
+              <small>stores endpoint</small>
+            </div>
+
+            <div className="prism-node-card prism-endpoint-node">
+              <span className="prism-node-icon">API</span>
+              <strong>Endpoint</strong>
+              <small>/health ping</small>
+              <span className="prism-warning-badge" aria-hidden="true">!</span>
+            </div>
+
+            <span className="prism-packet prism-register-packet">Endpoint</span>
+            <span className="prism-packet prism-request-packet">Request</span>
+            <span className="prism-packet prism-response-packet prism-good-response-packet">Good</span>
+            <span className="prism-packet prism-request-packet prism-bad-request-packet">Request</span>
+            <span className="prism-packet prism-response-packet prism-bad-response-packet">Bad</span>
+            <span className="prism-packet prism-alert-packet">Email alert</span>
+          </div>
           <div className="hero-cta-side">
             <Link to="/register" className="cta-primary">
               Start Monitoring

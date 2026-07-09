@@ -429,3 +429,345 @@
     font-size: 40px;
   }
 }
+
+/* ---- Hero Network Animation ---- */
+.prism-network-animation {
+  position: relative;
+  width: min(100%, 560px);
+  min-height: 340px;
+  overflow: hidden;
+  border: 1px solid rgba(25, 25, 25, 0.08);
+  border-radius: 12px;
+  background:
+    radial-gradient(circle at 50% 46%, rgba(250, 255, 244, 0.95), transparent 31%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.72), rgba(238, 233, 223, 0.62));
+  box-shadow: 0 28px 70px rgba(28, 25, 20, 0.12);
+}
+
+.prism-network-grid {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(rgba(25, 25, 25, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(25, 25, 25, 0.05) 1px, transparent 1px);
+  background-size: 52px 52px;
+  mask-image: radial-gradient(circle at center, #000 46%, transparent 78%);
+}
+
+.prism-node-card {
+  position: absolute;
+  z-index: 2;
+  display: grid;
+  gap: 4px;
+  width: 150px;
+  min-height: 116px;
+  padding: 14px 16px;
+  border: 1px solid rgba(25, 25, 25, 0.12);
+  border-radius: 8px;
+  color: #1f1f1f;
+  background: rgba(250, 248, 242, 0.92);
+  box-shadow: 0 14px 34px rgba(25, 25, 25, 0.1);
+}
+
+.prism-node-card strong {
+  font-size: 15px;
+  line-height: 1.1;
+}
+
+.prism-node-card small {
+  color: #6b665f;
+  font-size: 12px;
+}
+
+.prism-node-icon,
+.prism-mark {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  margin-bottom: 6px;
+  border-radius: 50%;
+  color: #ffffff;
+  background: #1b1b1b;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.prism-mark {
+  background: #28b783;
+}
+
+.prism-client-node {
+  top: 50%;
+  left: 32px;
+  transform: translateY(-50%);
+}
+
+.prism-prism-node {
+  top: 32px;
+  right: 32px;
+  animation: prismHeroPulse 3s ease-in-out infinite;
+}
+
+.prism-endpoint-node {
+  right: 32px;
+  bottom: 32px;
+  animation: prismEndpointState 10s ease-in-out infinite;
+}
+
+.prism-warning-badge {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  color: #ffffff;
+  background: #ee513d;
+  font-size: 16px;
+  font-weight: 900;
+  opacity: 0;
+  transform: scale(0.7);
+  animation: prismWarningFlash 10s ease-in-out infinite;
+}
+
+.prism-packet {
+  position: absolute;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 70px;
+  height: 30px;
+  border-radius: 999px;
+  color: #ffffff;
+  background: #1b1b1b;
+  font-size: 11px;
+  font-weight: 800;
+  box-shadow: 0 0 0 8px rgba(25, 25, 25, 0.08);
+}
+
+.prism-register-packet {
+  top: 156px;
+  left: 66px;
+  width: 82px;
+  animation: prismRegisterFlow 10s cubic-bezier(0.45, 0, 0.2, 1) infinite;
+}
+
+.prism-request-packet,
+.prism-response-packet {
+  right: 70px;
+  left: auto;
+  width: 74px;
+}
+
+.prism-request-packet {
+  top: 132px;
+  background: #28b783;
+  animation: prismRequestFlow 10s ease-in-out infinite;
+}
+
+.prism-bad-request-packet {
+  animation-name: prismBadRequestFlow;
+}
+
+.prism-response-packet {
+  top: 250px;
+}
+
+.prism-good-response-packet {
+  background: #28b783;
+  animation: prismGoodResponseFlow 10s ease-in-out infinite;
+}
+
+.prism-bad-response-packet {
+  top: 224px;
+  background: #ee513d;
+  animation: prismBadResponseFlow 10s ease-in-out infinite;
+}
+
+.prism-alert-packet {
+  top: 94px;
+  left: calc(100% - 218px);
+  width: 92px;
+  height: 34px;
+  background: #ee513d;
+  animation: prismAlertFlow 10s cubic-bezier(0.45, 0, 0.2, 1) infinite;
+}
+
+@keyframes prismHeroPulse {
+  0%, 100% { box-shadow: 0 14px 34px rgba(25, 25, 25, 0.1); }
+  45% { box-shadow: 0 14px 34px rgba(25, 25, 25, 0.1), 0 0 0 14px rgba(40, 183, 131, 0.12); }
+  72% { box-shadow: 0 14px 34px rgba(25, 25, 25, 0.1), 0 0 0 14px rgba(238, 81, 61, 0.12); }
+}
+
+@keyframes prismRegisterFlow {
+  0%, 4% { left: 66px; top: 156px; opacity: 0; transform: scale(0.9); }
+  7%, 12% { left: 66px; top: 156px; opacity: 1; transform: scale(1); }
+  22%, 27% { left: calc(100% - 174px); top: 62px; opacity: 1; transform: scale(1); }
+  30%, 100% { left: calc(100% - 174px); top: 62px; opacity: 0; transform: scale(1); }
+}
+
+@keyframes prismRequestFlow {
+  0%, 30% { opacity: 0; transform: translateY(0) scale(0.7); }
+  33%, 38% { opacity: 1; }
+  46%, 100% { opacity: 0; transform: translateY(118px) scale(1); }
+}
+
+@keyframes prismGoodResponseFlow {
+  0%, 48% { opacity: 0; transform: translateY(0) scale(0.82); }
+  51%, 56% { opacity: 1; }
+  64%, 100% { opacity: 0; transform: translateY(-118px) scale(1); }
+}
+
+@keyframes prismBadRequestFlow {
+  0%, 66% { opacity: 0; transform: translateY(0) scale(0.7); }
+  69%, 74% { opacity: 1; }
+  82%, 100% { opacity: 0; transform: translateY(118px) scale(1); }
+}
+
+@keyframes prismBadResponseFlow {
+  0%, 84% { opacity: 0; transform: translateY(0) scale(0.82); }
+  87%, 91% { opacity: 1; }
+  96%, 100% { opacity: 0; transform: translateY(-90px) scale(1); }
+}
+
+@keyframes prismAlertFlow {
+  0%, 92% { left: calc(100% - 218px); top: 94px; opacity: 0; transform: scale(0.82); }
+  94%, 96% { left: calc(100% - 218px); top: 94px; opacity: 1; transform: scale(1); }
+  99% { left: 66px; top: 156px; opacity: 1; transform: scale(1); }
+  100% { left: 66px; top: 156px; opacity: 0; transform: scale(1); }
+}
+
+@keyframes prismEndpointState {
+  0%, 82%, 100% { border-color: rgba(25, 25, 25, 0.12); }
+  84%, 96% {
+    border-color: rgba(238, 81, 61, 0.42);
+    box-shadow: 0 14px 34px rgba(25, 25, 25, 0.1), 0 0 0 12px rgba(238, 81, 61, 0.08);
+  }
+}
+
+@keyframes prismWarningFlash {
+  0%, 82%, 100% { opacity: 0; transform: scale(0.7); }
+  84%, 96% { opacity: 1; transform: scale(1); }
+}
+
+@media (max-width: 1024px) {
+  .prism-network-animation {
+    width: 100%;
+    max-width: 560px;
+  }
+}
+
+@media (max-width: 600px) {
+  .prism-network-animation {
+    min-height: 470px;
+  }
+
+  .prism-node-card {
+    width: 136px;
+    min-height: 96px;
+    padding: 11px;
+  }
+
+  .prism-node-card strong { font-size: 13px; }
+  .prism-node-card small { font-size: 11px; }
+
+  .prism-client-node {
+    top: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .prism-prism-node {
+    top: 176px;
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .prism-endpoint-node {
+    top: auto;
+    right: auto;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .prism-register-packet {
+    top: 126px;
+    left: calc(50% - 17px);
+    animation-name: prismRegisterFlowMobile;
+  }
+
+  .prism-request-packet,
+  .prism-response-packet {
+    right: auto;
+    width: 74px;
+  }
+
+  .prism-request-packet {
+    top: 278px;
+    left: calc(50% - 37px);
+    animation-name: prismRequestFlowMobile;
+  }
+
+  .prism-bad-request-packet { animation-name: prismBadRequestFlowMobile; }
+
+  .prism-response-packet {
+    top: 344px;
+    left: calc(50% - 37px);
+  }
+
+  .prism-good-response-packet { animation-name: prismGoodResponseFlowMobile; }
+
+  .prism-bad-response-packet {
+    top: 324px;
+    animation-name: prismBadResponseFlowMobile;
+  }
+
+  .prism-alert-packet {
+    top: 178px;
+    left: calc(50% - 41px);
+    animation-name: prismAlertFlowMobile;
+  }
+}
+
+@keyframes prismRegisterFlowMobile {
+  0%, 4% { top: 126px; left: calc(50% - 17px); opacity: 0; transform: scale(0.9); }
+  7%, 12% { top: 126px; left: calc(50% - 17px); opacity: 1; transform: scale(1); }
+  22%, 27% { top: 200px; left: calc(50% - 17px); opacity: 1; transform: scale(1); }
+  30%, 100% { top: 200px; left: calc(50% - 17px); opacity: 0; transform: scale(1); }
+}
+
+@keyframes prismRequestFlowMobile {
+  0%, 30% { opacity: 0; transform: translateY(0) scale(0.7); }
+  33%, 38% { opacity: 1; }
+  46%, 100% { opacity: 0; transform: translateY(74px) scale(1); }
+}
+
+@keyframes prismGoodResponseFlowMobile {
+  0%, 48% { opacity: 0; transform: translateY(0) scale(0.82); }
+  51%, 56% { opacity: 1; }
+  64%, 100% { opacity: 0; transform: translateY(-74px) scale(1); }
+}
+
+@keyframes prismBadRequestFlowMobile {
+  0%, 66% { opacity: 0; transform: translateY(0) scale(0.7); }
+  69%, 74% { opacity: 1; }
+  82%, 100% { opacity: 0; transform: translateY(74px) scale(1); }
+}
+
+@keyframes prismBadResponseFlowMobile {
+  0%, 84% { opacity: 0; transform: translateY(0) scale(0.82); }
+  87%, 91% { opacity: 1; }
+  96%, 100% { opacity: 0; transform: translateY(-56px) scale(1); }
+}
+
+@keyframes prismAlertFlowMobile {
+  0%, 92% { top: 178px; left: calc(50% - 41px); opacity: 0; transform: scale(0.82); }
+  94%, 96% { top: 178px; left: calc(50% - 41px); opacity: 1; transform: scale(1); }
+  99% { top: 48px; left: calc(50% - 41px); opacity: 1; transform: scale(1); }
+  100% { top: 48px; left: calc(50% - 41px); opacity: 0; transform: scale(1); }
+}
