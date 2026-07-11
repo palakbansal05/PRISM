@@ -1,4 +1,6 @@
 import { Link } from 'react-router-dom';
+import PublicNavbar from '../components/PublicNavbar';
+import PublicFooter from '../components/PublicFooter';
 import './LandingPage.css';
 
 export default function LandingPage() {
@@ -13,23 +15,7 @@ export default function LandingPage() {
       </div>
 
       {/* Navigation */}
-      <nav className="landing-nav">
-        <div className="landing-nav-brand">
-          <span>PRISM</span>
-        </div>
-        
-        <div className="landing-nav-center">
-          <Link to="#about" className="nav-link-item">About Us</Link>
-          <div className="nav-dropdown">
-            <span className="nav-link-item">Why <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9"/></svg></span>
-          </div>
-        </div>
-
-        <div className="landing-nav-links">
-          <Link to="/login" className="nav-link-login">Sign In</Link>
-          <Link to="/register" className="nav-link-register">Get Started</Link>
-        </div>
-      </nav>
+      <PublicNavbar />
 
       {/* Hero Split Layout */}
       <section className="landing-hero-split">
@@ -148,9 +134,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <footer className="landing-footer">
-        <p>Built for teams who need fast, reliable observability.</p>
-      </footer>
+      <PublicFooter />
     </div>
   );
 }
