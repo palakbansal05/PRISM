@@ -5,7 +5,7 @@
 
 **Zero-agent API monitoring. Know when your APIs fail — before your users do.**
 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-prism--nine--ochre.vercel.app-black?style=for-the-badge)](https://prism-nine-ochre.vercel.app)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-prismops.vercel.app-black?style=for-the-badge)](https://prismops.vercel.app)
 [![GitHub](https://img.shields.io/badge/GitHub-palakbansal05%2FPRISM-black?style=for-the-badge&logo=github)](https://github.com/palakbansal05/PRISM)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-palakbansal--05-0A66C2?style=for-the-badge&logo=linkedin)](https://www.linkedin.com/in/palakbansal-05-/)
 
@@ -438,5 +438,5 @@ Polling adds artificial latency (half the interval on average), wastes server re
 ---
 
 <div align="center">
-  <i>Built by Palak Bansal &mdash; because demos should never fail.</i>
+  <i>Built because demos should never fail.</i>
 </div>
