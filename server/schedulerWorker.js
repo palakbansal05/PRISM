@@ -139,7 +139,7 @@ async function executeCheck(endpoint) {
 
   // Clamped timeout: min(100, max(60, userTimeout)) * 1000
   const userTimeout = endpoint.timeoutSeconds || 60;
-  const effectiveTimeoutMs = Math.min(100, Math.max(60, userTimeout)) * 1000;
+  const effectiveTimeoutMs = Math.min(500, Math.max(60, userTimeout)) * 1000;
 
   try {
     const response = await axios({
