@@ -106,6 +106,7 @@ export default function IncidentsPage() {
               const epId = ep?._id;
               const replay = inlineReplay[epId];
               const isActive = inc.status === 'ACTIVE';
+              const canReplay = Boolean(epId);
 
               return (
                 <div className="incident-row" key={inc._id}>
@@ -132,10 +133,12 @@ export default function IncidentsPage() {
                     <button
                       className="incident-replay-btn"
                       onClick={() => handleReplay(epId, true)}
-                      disabled={replay?.loading}
+                      disabled={!canReplay || replay?.loading}
                     >
                       {replay?.loading ? (
                         <span className="mini-spinner"></span>
+                      ) : !canReplay ? (
+                        'Unavailable'
                       ) : (
                         <>
                           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
