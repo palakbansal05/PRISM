@@ -20,7 +20,29 @@ router.get('/', async (req, res) => {
       .limit(20)
       .populate('endpointId', 'name url method');
 
-    res.json({ incidents });
+    const normalized = incidents.map((incident) => {
+      const endpoint = incident.endpointId;
+      const endpointSnapshot = endpoint
+        ? {
+            _id: endpoint._id,
+            name: endpoint.name,
+            url: endpoint.url,
+            method: endpoint.method,
+          }
+        : {
+            _id: null,
+            name: incident.endpointName || 'Unknown',
+            url: incident.endpointUrl || '',
+            method: null,
+          };
+
+      return {
+        ...incident.toObject(),
+        endpointId: endpointSnapshot,
+      };
+    });
+
+    res.json({ incidents: normalized });
   } catch (err) {
     console.error('Incidents error:', err);
     res.status(500).json({ error: 'Server error.' });

@@ -2,6 +2,7 @@ const express = require('express');
 const Endpoint = require('../models/Endpoint');
 const Ping = require('../models/Ping');
 const Incident = require('../models/Incident');
+const User = require('../models/User');
 const auth = require('../middleware/auth');
 
 const router = express.Router();
@@ -42,6 +43,7 @@ router.post('/', async (req, res) => {
   try {
     const { name, url, method, expectedStatus, intervalSeconds, headers, body, alertEmail, expectedResponseMs, timeoutSeconds } =
       req.body;
+    const user = await User.findById(req.userId).select('email');
 
     if (!name || !url) {
       return res.status(400).json({ error: 'Name and URL are required.' });
@@ -101,7 +103,7 @@ router.post('/', async (req, res) => {
       timeoutSeconds: timeoutSeconds || 60,
       headers: parsedHeaders,
       body: body || null,
-      alertEmail: alertEmail || null,
+      alertEmail: alertEmail?.trim() || user?.email || null,
     });
 
     await endpoint.save();
@@ -133,9 +135,19 @@ router.delete('/:id', async (req, res) => {
       return res.status(404).json({ error: 'Endpoint not found.' });
     }
 
-    // Cascade delete all pings and incidents
+    // Preserve incident history by snapshotting the endpoint details before deletion.
+    await Incident.updateMany(
+      { endpointId: endpoint._id },
+      {
+        $set: {
+          endpointName: endpoint.name,
+          endpointUrl: endpoint.url,
+        },
+      }
+    );
+
+    // Remove pings, but keep incidents for historical reporting.
     await Ping.deleteMany({ endpointId: endpoint._id });
-    await Incident.deleteMany({ endpointId: endpoint._id });
     await Endpoint.deleteOne({ _id: endpoint._id });
 
     // Notify scheduler to stop monitoring

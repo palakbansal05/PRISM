@@ -77,6 +77,8 @@ async function connectDB() {
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     status: { type: String, enum: ['ACTIVE', 'RESOLVED'], default: 'ACTIVE' },
     reason: { type: String, default: 'Unknown' },
+    endpointName: { type: String, default: null, trim: true },
+    endpointUrl: { type: String, default: null, trim: true },
     statusCodeReceived: { type: Number, default: null },
     startedAt: { type: Date, required: true, default: Date.now },
     resolvedAt: { type: Date, default: null },
@@ -137,9 +139,11 @@ async function executeCheck(endpoint) {
   const userOid = new mongoose.Types.ObjectId(endpoint.userId);
   let ping;
 
-  // Clamped timeout: min(100, max(60, userTimeout)) * 1000
+  // Treat the configured timeout as the down threshold, but allow extra time
+  // for the request to finish so we can classify late responses correctly.
   const userTimeout = endpoint.timeoutSeconds || 60;
-  const effectiveTimeoutMs = Math.min(500, Math.max(60, userTimeout)) * 1000;
+  const downThresholdMs = Math.max(1, userTimeout) * 1000;
+  const requestTimeoutMs = Math.max(downThresholdMs + 30000, 120000);
 
   try {
     const response = await axios({
@@ -147,12 +151,13 @@ async function executeCheck(endpoint) {
       url: endpoint.url,
       headers: endpoint.headers || {},
       data: endpoint.body || undefined,
-      timeout: effectiveTimeoutMs,
+      timeout: requestTimeoutMs,
       validateStatus: () => true, // Accept any status to record the actual code
     });
 
     const latencyMs = Date.now() - startTime;
-    const success = response.status === endpoint.expectedStatus;
+    const isDownByLatency = latencyMs > downThresholdMs;
+    const success = response.status === endpoint.expectedStatus && !isDownByLatency;
 
     // Truncate response body to 10KB
     let responseBody = '';
@@ -180,7 +185,15 @@ async function executeCheck(endpoint) {
 
     await ping.save();
 
-    if (!success) {
+    if (isDownByLatency) {
+      // Response eventually returned, but only after the configured down threshold.
+      await handleFailure(
+        endpoint,
+        ping,
+        response.status,
+        `Response time ${latencyMs}ms exceeded downtime threshold ${downThresholdMs}ms`
+      );
+    } else if (!success) {
       // Wrong status code → treat as failure (DOWN)
       await handleFailure(endpoint, ping, response.status);
     } else {
@@ -239,6 +252,8 @@ async function handleFailure(endpoint, ping, statusCode, errorMsg) {
       userId: userOid,
       status: 'ACTIVE',
       reason,
+      endpointName: endpoint.name,
+      endpointUrl: endpoint.url,
       statusCodeReceived: statusCode,
       startedAt: now,
       lastCheckedAt: now,
@@ -343,7 +358,7 @@ async function handleSuccess(endpoint, ping, latencyMs) {
       }
     );
 
-    // Determine new status: if response was slow, go to DEGRADED not UP
+    // Determine new status: if response was slow, stay degraded and send the slow alert.
     const newStatus = isSlow ? 'DEGRADED' : 'UP';
 
     await Endpoint.updateOne(
@@ -364,22 +379,8 @@ async function handleSuccess(endpoint, ping, latencyMs) {
     endpoint.consecutiveSuccesses = 1;
     endpointMap.set(endpoint._id, endpoint);
 
-    // Build resolved incident object for email
-    const resolvedIncident = openIncident.toObject();
-    resolvedIncident.resolvedAt = now;
-    resolvedIncident.status = 'RESOLVED';
-
-    // Notify main thread → triggers recovery email + Socket.IO
-    parentPort.postMessage({
-      type: 'INCIDENT_RESOLVED',
-      endpointId: endpoint._id,
-      endpointName: endpoint.name,
-      incident: resolvedIncident,
-      ping: ping.toObject(),
-    });
-
-    // If it recovered from DOWN but is still slow, also notify about degradation
     if (isSlow) {
+      // Slow recovery should be treated as degraded, not as a recovery email.
       parentPort.postMessage({
         type: 'PERFORMANCE_DEGRADED',
         endpointId: endpoint._id,
@@ -388,7 +389,20 @@ async function handleSuccess(endpoint, ping, latencyMs) {
         latencyMs,
         expectedResponseMs,
       });
-      console.log(`⚠️ [DEGRADED] ${endpoint.name} — ${latencyMs}ms (expected ${expectedResponseMs}ms)`);
+    } else {
+      // Build resolved incident object for email
+      const resolvedIncident = openIncident.toObject();
+      resolvedIncident.resolvedAt = now;
+      resolvedIncident.status = 'RESOLVED';
+
+      // Notify main thread → triggers recovery email + Socket.IO
+      parentPort.postMessage({
+        type: 'INCIDENT_RESOLVED',
+        endpointId: endpoint._id,
+        endpointName: endpoint.name,
+        incident: resolvedIncident,
+        ping: ping.toObject(),
+      });
     }
 
     console.log(`🟢 [Incident RESOLVED] ${endpoint.name} — back ${newStatus}`);

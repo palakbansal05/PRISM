@@ -23,6 +23,16 @@ const incidentSchema = new mongoose.Schema({
     type: String,
     default: 'Unknown',
   },
+  endpointName: {
+    type: String,
+    default: null,
+    trim: true,
+  },
+  endpointUrl: {
+    type: String,
+    default: null,
+    trim: true,
+  },
   statusCodeReceived: {
     type: Number,
     default: null,

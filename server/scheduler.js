@@ -14,9 +14,23 @@
 const { Worker } = require('worker_threads');
 const path = require('path');
 const Endpoint = require('./models/Endpoint');
+const User = require('./models/User');
 const mailer = require('./utils/mailer');
 
 let worker = null;
+
+async function resolveAlertEmail(endpoint) {
+  if (endpoint?.alertEmail) {
+    return endpoint.alertEmail;
+  }
+
+  if (!endpoint?.userId) {
+    return null;
+  }
+
+  const user = await User.findById(endpoint.userId).select('email');
+  return user?.email || null;
+}
 
 /**
  * Start the scheduler worker thread
@@ -48,7 +62,9 @@ function start() {
         // Send ONE failure alert email
         try {
           const endpoint = await Endpoint.findById(msg.endpointId);
-          if (endpoint && endpoint.alertEmail) {
+          const alertEmail = await resolveAlertEmail(endpoint);
+          if (endpoint && alertEmail) {
+            endpoint.alertEmail = alertEmail;
             await mailer.sendDownAlert(endpoint, msg.incident);
           }
         } catch (err) {
@@ -83,7 +99,9 @@ function start() {
         // Send ONE recovery email
         try {
           const endpoint = await Endpoint.findById(msg.endpointId);
-          if (endpoint && endpoint.alertEmail) {
+          const alertEmail = await resolveAlertEmail(endpoint);
+          if (endpoint && alertEmail) {
+            endpoint.alertEmail = alertEmail;
             await mailer.sendRecoveryAlert(endpoint, msg.incident);
           }
         } catch (err) {
@@ -117,7 +135,9 @@ function start() {
         // Send ONE degraded alert email (only fires on state change)
         try {
           const endpoint = await Endpoint.findById(msg.endpointId);
-          if (endpoint && endpoint.alertEmail) {
+          const alertEmail = await resolveAlertEmail(endpoint);
+          if (endpoint && alertEmail) {
+            endpoint.alertEmail = alertEmail;
             await mailer.sendDegradedAlert(endpoint, msg.ping);
           }
         } catch (err) {
