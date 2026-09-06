@@ -4,6 +4,7 @@ export default function PublicFooter() {
       <div className="footer-content">
         <div className="footer-section brand-section">
           <h3>PRISM</h3>
+          <p className="prism-fullform"><strong>P</strong>roactive <strong>R</strong>equest <strong>I</strong>nspection &amp; <strong>S</strong>tatus <strong>M</strong>onitor</p>
           <p>Built for teams who need fast, reliable observability.</p>
         </div>
         

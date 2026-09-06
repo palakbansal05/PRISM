@@ -456,6 +456,18 @@
   line-height: 1.6;
 }
 
+.prism-fullform {
+  font-size: 13px !important;
+  color: var(--text-tertiary) !important;
+  letter-spacing: 0.3px;
+  margin-bottom: 8px;
+}
+
+.prism-fullform strong {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
 .footer-links {
   display: flex;
   flex-direction: column;
